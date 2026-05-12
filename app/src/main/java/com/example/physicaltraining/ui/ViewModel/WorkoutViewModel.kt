@@ -63,7 +63,13 @@ fun removeSet(exercise: String, setIndex: Int) {
     }
 }
 
-
+    fun getAiRestTime(weight: Float, reps: Int) : Int {
+        return when {
+            weight >= 100f -> 100
+            weight >= 60f && reps <= 5 -> 120
+            else -> 60
+        }
+    }
 
 
 }

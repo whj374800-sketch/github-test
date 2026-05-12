@@ -3,11 +3,13 @@ package com.example.physicaltraining.ui.navigation
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -33,11 +35,15 @@ fun MainApp(viewModel: WorkoutViewModel) {
 
     NavHost(navController = navController, startDestination = AppRoute.Home.route) {
         composable(AppRoute.Home.route) { HomeScreen(navController) }
+
         composable(AppRoute.CheckList.route) {
             CheckListScreen(viewModel, navController) }
-        composable(AppRoute.Timer.route) { backStackEntry ->
+
+        composable("timer/{exerciseName}/{initialTime}") { backStackEntry ->
             val exerciseName = backStackEntry.arguments?.getString("exerciseName") ?: "운동"
-            TimerScreen(exerciseName, navController)
+            val initialTime = backStackEntry.arguments?.getString("initialTime")?.toIntOrNull() ?: 60
+
+            TimerScreen(exerciseName, initialTime, navController)
 
         }
         composable(AppRoute.Graph.route) { GraphScreen() }
@@ -56,7 +62,7 @@ fun HomeScreen(navController: NavController) {
         Spacer(modifier = Modifier.height(32.dp))
 
         HomeButton("체크 리스트") {navController.navigate(AppRoute.CheckList.route)}
-        HomeButton("휴식 타이머") {navController.navigate(AppRoute.Timer.route)}
+        HomeButton("휴식 타이머") {navController.navigate("timer/자유 휴식/60")}
         HomeButton("성장 그래프") {navController.navigate(AppRoute.Graph.route)}
         HomeButton("AI 무게 설정") {navController.navigate(AppRoute.AiSetup.route)}
     }
@@ -74,8 +80,8 @@ fun HomeButton(text : String, onClick: () -> Unit) {
 
 
 @Composable
-fun TimerScreen(exerciseName: String,navController: NavController) {
-    var timeLeft by remember { mutableStateOf(60) }
+fun TimerScreen(exerciseName: String, initialTime: Int, navController: NavController) {
+    var timeLeft by remember { mutableStateOf(initialTime) }
     var isRunning by remember { mutableStateOf(true) }
 
     LaunchedEffect(key1 = isRunning) {
@@ -94,6 +100,28 @@ fun TimerScreen(exerciseName: String,navController: NavController) {
         Text(text = "휴식 중", style = MaterialTheme.typography.bodyLarge)
 
         Spacer(modifier = Modifier.height(32.dp))
+
+        Text(
+            text = String.format("%02d:%02d", timeLeft / 60, timeLeft % 60),
+            style = MaterialTheme.typography.displayLarge
+        )
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        Row {
+            Button(onClick = {
+                timeLeft = (timeLeft - 10).coerceAtLeast(0)}) {
+                Text("-10초")
+            }
+            Spacer(modifier = Modifier.width(16.dp))
+
+            Button(onClick = {
+                timeLeft += 10}) {
+                Text("+10초")
+            }
+        }
+
+        Spacer(modifier = Modifier.height(48.dp))
 
         Button(onClick = { navController.popBackStack() }) {
             Text("휴식 완료")

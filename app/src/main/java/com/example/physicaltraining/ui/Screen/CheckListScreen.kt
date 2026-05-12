@@ -33,7 +33,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.physicaltraining.ui.WorkoutViewModel
-import com.example.physicaltraining.ui.navigation.AppRoute
 
 
 @Composable
@@ -63,7 +62,7 @@ fun CheckListScreen(viewModel: WorkoutViewModel, navController: NavController) {
                         )
 
                         IconButton(onClick = {
-                            navController.navigate(AppRoute.Timer.createRoute(exercise))
+                            navController.navigate("timer/$exercise/60")
                         }) {
                             Icon(
                                 imageVector = Icons.Default.PlayArrow,
@@ -81,7 +80,14 @@ fun CheckListScreen(viewModel: WorkoutViewModel, navController: NavController) {
                         ) {
                             Checkbox(
                                 checked = setInfo.isChecked,
-                                onCheckedChange = { viewModel.toggleSet(exercise, index) }
+                                onCheckedChange = { isChecked ->
+                                    viewModel.toggleSet(exercise, index)
+
+                                if (isChecked) {
+                                    val aiTime = viewModel.getAiRestTime(setInfo.weight, setInfo.reps)
+                                    navController.navigate("timer/$exercise/$aiTime")
+                                }
+                                }
                            )
                             Text(
                                 text = "${index + 1} 세트 : ${setInfo.weight}kg * ${setInfo.reps}회",
