@@ -1,5 +1,6 @@
 package com.example.physicaltraining.ui.screen
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -8,17 +9,20 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -34,7 +38,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.physicaltraining.ui.WorkoutViewModel
 
-
 @Composable
 fun CheckListScreen(viewModel: WorkoutViewModel, navController: NavController) {
     val exerciseSets by viewModel.exerciseSets.collectAsState()
@@ -43,14 +46,42 @@ fun CheckListScreen(viewModel: WorkoutViewModel, navController: NavController) {
     var inputWeight by remember { mutableStateOf("") }
     var inputReps by remember { mutableStateOf("") }
 
-    Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
-        Text("오늘의 운동 루틴", style = MaterialTheme.typography.headlineMedium)
-        Spacer(modifier = Modifier.height(16.dp))
+    var showAddExerciseDialog by remember { mutableStateOf(false) }
+    var inputExerciseName by remember { mutableStateOf("") }
 
 
-        LazyColumn(modifier = Modifier.weight(1f)) {
-            exerciseSets.forEach { (exercise, sets) ->
-                item {
+    Scaffold(
+        bottomBar = {
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+                Button(
+                    onClick = { showAddExerciseDialog = true },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp)
+                ) {
+                    Text("+ 새로운 운동 종목 추가하기", style = MaterialTheme.typography.titleMedium)
+                }
+            }
+        }
+    ) { innerPadding ->
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .padding(horizontal = 16.dp)
+        ) {
+            Spacer(modifier = Modifier.height(16.dp))
+            Text("오늘의 운동 루틴", style = MaterialTheme.typography.headlineMedium)
+            Spacer(modifier = Modifier.height(16.dp))
+
+            LazyColumn(modifier = Modifier.fillMaxSize()) {
+                items(exerciseSets.toList()) { (exercise, sets) ->
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
@@ -73,7 +104,6 @@ fun CheckListScreen(viewModel: WorkoutViewModel, navController: NavController) {
                     }
 
                     sets.forEachIndexed { index, setInfo ->
-
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier.fillMaxWidth().padding(start = 16.dp, top = 4.dp, bottom = 4.dp)
@@ -83,18 +113,18 @@ fun CheckListScreen(viewModel: WorkoutViewModel, navController: NavController) {
                                 onCheckedChange = { isChecked ->
                                     viewModel.toggleSet(exercise, index)
 
-                                if (isChecked) {
-                                    val aiTime = viewModel.getAiRestTime(setInfo.weight, setInfo.reps)
-                                    navController.navigate("timer/$exercise/$aiTime")
+                                    if (isChecked) {
+                                        val aiTime = viewModel.getAiRestTime(setInfo.weight, setInfo.reps)
+                                        navController.navigate("timer/$exercise/$aiTime")
+                                    }
                                 }
-                                }
-                           )
+                            )
                             Text(
                                 text = "${index + 1} 세트 : ${setInfo.weight}kg * ${setInfo.reps}회",
                                 style = MaterialTheme.typography.bodyMedium,
                                 modifier = Modifier.weight(1f)
                             )
-                            IconButton(onClick = {viewModel.removeSet(exercise, index)}) {
+                            IconButton(onClick = { viewModel.removeSet(exercise, index) }) {
                                 Icon(
                                     imageVector = Icons.Default.Delete,
                                     contentDescription = "세트 삭제",
@@ -117,6 +147,44 @@ fun CheckListScreen(viewModel: WorkoutViewModel, navController: NavController) {
         }
     }
 
+
+    if (showAddExerciseDialog) {
+        AlertDialog(
+            onDismissRequest = { showAddExerciseDialog = false },
+            title = { Text("새로운 운동 종목 추가") },
+            text = {
+                OutlinedTextField(
+                    value = inputExerciseName,
+                    onValueChange = { inputExerciseName = it },
+                    label = { Text("운동 이름 (예: 바벨로우)") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        viewModel.addExercise(inputExerciseName)
+                        inputExerciseName = ""
+                        showAddExerciseDialog = false
+                    }
+                ) {
+                    Text("추가")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        inputExerciseName = ""
+                        showAddExerciseDialog = false
+                    }
+                ) {
+                    Text("취소")
+                }
+            }
+        )
+    }
+
     showAddDialogFor?.let { exerciseName ->
         AlertDialog(
             onDismissRequest = {
@@ -127,15 +195,15 @@ fun CheckListScreen(viewModel: WorkoutViewModel, navController: NavController) {
                 Column {
                     OutlinedTextField(
                         value = inputWeight,
-                        onValueChange = { inputWeight = it},
-                        label = {Text("무게 (kg)")},
+                        onValueChange = { inputWeight = it },
+                        label = { Text("무게 (kg)") },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
                     )
                     OutlinedTextField(
                         value = inputReps,
-                        onValueChange = { inputReps = it},
-                        label = {Text("횟수 (회)")},
+                        onValueChange = { inputReps = it },
+                        label = { Text("횟수 (회)") },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         modifier = Modifier.fillMaxWidth()
                     )
@@ -158,12 +226,10 @@ fun CheckListScreen(viewModel: WorkoutViewModel, navController: NavController) {
                 }
             },
             dismissButton = {
-                TextButton(onClick = {showAddDialogFor = null}) {
+                TextButton(onClick = { showAddDialogFor = null }) {
                     Text("취소")
                 }
             }
         )
     }
-
-
 }

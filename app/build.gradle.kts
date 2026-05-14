@@ -5,13 +5,13 @@ plugins {
 }
 
 android {
-    namespace = "com.example.roomexample"
+    namespace = "com.example.physicaltraining"
     compileSdk {
         version = release(36)
     }
 
     defaultConfig {
-        applicationId = "com.example.roomexample"
+        applicationId = "com.example.physicaltraining"
         minSdk = 35
         targetSdk = 36
         versionCode = 1
@@ -49,7 +49,7 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
-    //implementation(libs.androidx.room.compiler)
+    implementation(libs.androidx.room.compiler)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     ksp(libs.androidx.room.compiler)
     testImplementation(libs.junit)
@@ -59,4 +59,9 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+    implementation(libs.androidx.navigation.compose)
+
+    configurations.all {
+        exclude(group = "com.intellij", module = "annotations")
+    }
 }

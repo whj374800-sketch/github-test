@@ -71,5 +71,17 @@ fun removeSet(exercise: String, setIndex: Int) {
         }
     }
 
+    fun addExercise(exerciseName: String) {
+        _exerciseSets.update { currentMap ->
+            if (currentMap.containsKey(exerciseName) || exerciseName.isBlank())
+            {
+                currentMap
+            }
+            else {
+                currentMap + (exerciseName to emptyList())
+            }
+        }
+    }
+
 
 }

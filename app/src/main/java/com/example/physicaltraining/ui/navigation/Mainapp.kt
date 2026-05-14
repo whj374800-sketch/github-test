@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
@@ -33,7 +34,10 @@ import com.example.physicaltraining.ui.screen.CheckListScreen
 fun MainApp(viewModel: WorkoutViewModel) {
     val navController = rememberNavController()
 
-    NavHost(navController = navController, startDestination = AppRoute.Home.route) {
+    NavHost(navController = navController,
+        startDestination = AppRoute.Home.route,
+        modifier = Modifier.systemBarsPadding()
+        ) {
         composable(AppRoute.Home.route) { HomeScreen(navController) }
 
         composable(AppRoute.CheckList.route) {
