@@ -9,13 +9,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -26,6 +27,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -33,43 +35,42 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.physicaltraining.ui.WorkoutViewModel
+import com.example.physicaltraining.ui.navigation.AppRoute
 
 @Composable
-fun CheckListScreen(viewModel: WorkoutViewModel, navController: NavController) {
-    val exerciseSets by viewModel.exerciseSets.collectAsState()
+fun CheckListScreen(routineId: String, viewModel: WorkoutViewModel, navController: NavController) {
+    val routines by viewModel.routines.collectAsState()
+    val currentRoutine = routines.find { it.id == routineId }
 
-    var showAddDialogFor by remember { mutableStateOf<String?>(null) }
-    var inputWeight by remember { mutableStateOf("") }
-    var inputReps by remember { mutableStateOf("") }
+    if (currentRoutine == null) {
+        LaunchedEffect(Unit) { navController.popBackStack() }
+        return
+    }
 
     var showAddExerciseDialog by remember { mutableStateOf(false) }
     var inputExerciseName by remember { mutableStateOf("") }
-
+    var showSetDialogFor by remember { mutableStateOf<String?>(null) }
+    var inputWeight by remember { mutableStateOf("") }
+    var inputReps by remember { mutableStateOf("") }
 
     Scaffold(
         bottomBar = {
-
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-            ) {
+            Box(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
                 Button(
                     onClick = { showAddExerciseDialog = true },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(56.dp)
+                    modifier = Modifier.fillMaxWidth().height(56.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Red, contentColor = Color.White)
                 ) {
                     Text("+ 새로운 운동 종목 추가하기", style = MaterialTheme.typography.titleMedium)
                 }
             }
         }
     ) { innerPadding ->
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -77,33 +78,26 @@ fun CheckListScreen(viewModel: WorkoutViewModel, navController: NavController) {
                 .padding(horizontal = 16.dp)
         ) {
             Spacer(modifier = Modifier.height(16.dp))
-            Text("오늘의 운동 루틴", style = MaterialTheme.typography.headlineMedium)
+            Text(text = currentRoutine.name, style = MaterialTheme.typography.headlineMedium)
             Spacer(modifier = Modifier.height(16.dp))
 
             LazyColumn(modifier = Modifier.fillMaxSize()) {
-                items(exerciseSets.toList()) { (exercise, sets) ->
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
-                    ) {
-                        Text(
-                            text = exercise,
-                            style = MaterialTheme.typography.titleLarge,
-                            modifier = Modifier.weight(1f)
-                        )
-
-                        IconButton(onClick = {
-                            navController.navigate("timer/$exercise/60")
-                        }) {
-                            Icon(
-                                imageVector = Icons.Default.PlayArrow,
-                                "타이머 시작",
-                                tint = MaterialTheme.colorScheme.primary
-                            )
+                currentRoutine.exercises.forEach { (exercise, sets) ->
+                    item {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
+                        ) {
+                            Text(text = exercise, style = MaterialTheme.typography.titleLarge, modifier = Modifier.weight(1f))
+                            IconButton(onClick = {
+                                navController.navigate(AppRoute.Timer.createRoute(exercise, 60))
+                            }) {
+                                Icon(Icons.Default.PlayArrow, "타이머 시작", tint = MaterialTheme.colorScheme.primary)
+                            }
                         }
                     }
 
-                    sets.forEachIndexed { index, setInfo ->
+                    itemsIndexed(sets) { index, setInfo ->
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier.fillMaxWidth().padding(start = 16.dp, top = 4.dp, bottom = 4.dp)
@@ -111,42 +105,31 @@ fun CheckListScreen(viewModel: WorkoutViewModel, navController: NavController) {
                             Checkbox(
                                 checked = setInfo.isChecked,
                                 onCheckedChange = { isChecked ->
-                                    viewModel.toggleSet(exercise, index)
-
+                                    viewModel.toggleSet(currentRoutine.id, exercise, index)
                                     if (isChecked) {
                                         val aiTime = viewModel.getAiRestTime(setInfo.weight, setInfo.reps)
-                                        navController.navigate("timer/$exercise/$aiTime")
+                                        navController.navigate(AppRoute.Timer.createRoute(exercise, aiTime))
                                     }
                                 }
                             )
-                            Text(
-                                text = "${index + 1} 세트 : ${setInfo.weight}kg * ${setInfo.reps}회",
-                                style = MaterialTheme.typography.bodyMedium,
-                                modifier = Modifier.weight(1f)
-                            )
-                            IconButton(onClick = { viewModel.removeSet(exercise, index) }) {
-                                Icon(
-                                    imageVector = Icons.Default.Delete,
-                                    contentDescription = "세트 삭제",
-                                    tint = MaterialTheme.colorScheme.error
-                                )
+                            Text(text = "${index + 1} 세트 : ${setInfo.weight}kg * ${setInfo.reps}회", modifier = Modifier.weight(1f))
+                            IconButton(onClick = { viewModel.removeSet(currentRoutine.id, exercise, index) }) {
+                                Icon(Icons.Default.Delete, "세트 삭제", tint = MaterialTheme.colorScheme.error)
                             }
                         }
                     }
 
-                    TextButton(
-                        onClick = { showAddDialogFor = exercise },
-                        modifier = Modifier.padding(start = 16.dp)
-                    ) {
-                        Text("+ 세트 추가")
+                    item {
+                        TextButton(
+                            onClick = { showSetDialogFor = exercise },
+                            modifier = Modifier.padding(start = 16.dp)
+                        ) { Text("+ 세트 추가") }
+                        HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp))
                     }
-
-                    HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp))
                 }
             }
         }
     }
-
 
     if (showAddExerciseDialog) {
         AlertDialog(
@@ -157,39 +140,25 @@ fun CheckListScreen(viewModel: WorkoutViewModel, navController: NavController) {
                     value = inputExerciseName,
                     onValueChange = { inputExerciseName = it },
                     label = { Text("운동 이름 (예: 바벨로우)") },
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth()
+                    singleLine = true
                 )
             },
             confirmButton = {
-                TextButton(
-                    onClick = {
-                        viewModel.addExercise(inputExerciseName)
-                        inputExerciseName = ""
-                        showAddExerciseDialog = false
-                    }
-                ) {
-                    Text("추가")
-                }
+                TextButton(onClick = {
+                    viewModel.addExerciseToRoutine(currentRoutine.id, inputExerciseName)
+                    inputExerciseName = ""
+                    showAddExerciseDialog = false
+                }) { Text("추가") }
             },
             dismissButton = {
-                TextButton(
-                    onClick = {
-                        inputExerciseName = ""
-                        showAddExerciseDialog = false
-                    }
-                ) {
-                    Text("취소")
-                }
+                TextButton(onClick = { showAddExerciseDialog = false }) { Text("취소") }
             }
         )
     }
 
-    showAddDialogFor?.let { exerciseName ->
+    showSetDialogFor?.let { exerciseName ->
         AlertDialog(
-            onDismissRequest = {
-                showAddDialogFor = null
-            },
+            onDismissRequest = { showSetDialogFor = null },
             title = { Text("$exerciseName 세트 추가") },
             text = {
                 Column {
@@ -198,7 +167,7 @@ fun CheckListScreen(viewModel: WorkoutViewModel, navController: NavController) {
                         onValueChange = { inputWeight = it },
                         label = { Text("무게 (kg)") },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
+                        modifier = Modifier.padding(bottom = 8.dp).fillMaxWidth()
                     )
                     OutlinedTextField(
                         value = inputReps,
@@ -210,25 +179,17 @@ fun CheckListScreen(viewModel: WorkoutViewModel, navController: NavController) {
                 }
             },
             confirmButton = {
-                TextButton(
-                    onClick = {
-                        val weight = inputWeight.toFloatOrNull() ?: 20f
-                        val reps = inputReps.toIntOrNull() ?: 10
-
-                        viewModel.addSet(exerciseName, weight, reps)
-
-                        inputWeight = ""
-                        inputReps = ""
-                        showAddDialogFor = null
-                    }
-                ) {
-                    Text("추가")
-                }
+                TextButton(onClick = {
+                    val weight = inputWeight.toFloatOrNull() ?: 20f
+                    val reps = inputReps.toIntOrNull() ?: 10
+                    viewModel.addSet(currentRoutine.id, exerciseName, weight, reps)
+                    inputWeight = ""
+                    inputReps = ""
+                    showSetDialogFor = null
+                }) { Text("추가") }
             },
             dismissButton = {
-                TextButton(onClick = { showAddDialogFor = null }) {
-                    Text("취소")
-                }
+                TextButton(onClick = { showSetDialogFor = null }) { Text("취소") }
             }
         )
     }
