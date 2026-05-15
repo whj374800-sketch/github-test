@@ -3,17 +3,34 @@ package com.example.physicaltraining.data.local
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface WorkoutDao {
-    @Query("SELECT * FROM workouts ORDER BY date DESC")
-    fun getAllWorkouts(): Flow<List<WorkoutEntity>>
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertRoutine(routine: RoutineEntity)
 
-    @Insert
-    suspend fun insertWorkout(workout: WorkoutEntity)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertSets(sets: List<WorkoutSetEntity>)
+
+    @Query("SELECT * FROM routines ORDER BY date DESC")
+    fun getAllRoutines(): Flow<List<RoutineEntity>>
+
+    @Query("SELECT * FROM workout_sets WHERE routineId = :routineId")
+    fun getSetsForRoutine(routineId: String): Flow<List<WorkoutSetEntity>>
+
+    @Update
+    suspend fun updateSet(set: WorkoutSetEntity)
 
     @Delete
-    suspend fun deleteWorkout(workout: WorkoutEntity)
+    suspend fun deleteRoutine(routine: RoutineEntity)
+
+    @Query("DELETE FROM workout_sets WHERE routineId = :routineId AND exerciseName = :exerciseName")
+    suspend fun deleteSetsByExercise(routineId: String, exerciseName: String)
+
+    @Query("DELETE FROM workout_sets WHERE setId = :setId")
+    suspend fun deleteSetById(setId: Int)
 }
