@@ -9,7 +9,8 @@ import androidx.room.PrimaryKey
 data class RoutineEntity(
     @PrimaryKey val id: String,
     val name: String,
-    val date: Long = System.currentTimeMillis()
+    val date: Long = System.currentTimeMillis(),
+    val restTime: Int = 60
 )
 
 @Entity(

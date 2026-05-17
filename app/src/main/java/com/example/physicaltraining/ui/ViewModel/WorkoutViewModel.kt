@@ -7,6 +7,7 @@ import com.example.physicaltraining.data.local.RoutineEntity
 import com.example.physicaltraining.data.local.WorkoutSetEntity
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.UUID
@@ -21,30 +22,53 @@ data class WorkoutSet(
 data class DailyRoutine(
     val id: String = UUID.randomUUID().toString(),
     val name: String,
-    val exercises: Map<String, List<WorkoutSet>> = emptyMap()
+    val exercises: Map<String, List<WorkoutSet>> = emptyMap(),
+    val restTime: Int= 60
 )
 
 class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() {
 
-    private val _routines = MutableStateFlow<List<DailyRoutine>>(
-        listOf(
-            DailyRoutine(
-                name = "기본 샘플 루틴",
-                exercises = mapOf(
-                    "벤치프레스" to listOf(WorkoutSet(weight = 60f, reps =  10),
-                                        WorkoutSet(weight = 65f, reps = 8)),
-                    "스쿼트" to listOf(WorkoutSet(weight = 80f, reps =  10))
-                )
-            )
-        )
-    )
+    private val _routines = MutableStateFlow<List<DailyRoutine>>(emptyList())
     val routines = _routines.asStateFlow()
 
+    init {
+        loadRoutinesFromDb()
+    }
+
+    private fun loadRoutinesFromDb() {
+        viewModelScope.launch {
+            repository.allRoutines.collect { routineEntities ->
+                val loadedRoutines = routineEntities.map { entity ->
+                    val setEntities = repository.getSetsForRoutine(entity.id).first()
+
+                    val exerciseMap = setEntities.groupBy { it.exerciseName }
+                        .mapValues { (_, sets) ->
+                            sets.map { setEntity ->
+                                WorkoutSet(
+                                    setId = setEntity.setId,
+                                    weight = setEntity.weight,
+                                    reps = setEntity.reps,
+                                    isChecked = setEntity.isChecked
+                                )
+                            }
+                        }
+
+                    DailyRoutine(
+                        id = entity.id,
+                        name = entity.name,
+                        exercises = exerciseMap,
+                        restTime = entity.restTime
+
+                    )
+                }
+                _routines.value = loadedRoutines
+
+            }
+        }
+    }
     fun addRoutine(name: String) {
         if (name.isBlank()) return
         val newRoutine = DailyRoutine(name = name)
-
-        _routines.update { it + newRoutine }
 
         viewModelScope.launch {
             repository.insertRoutine(RoutineEntity(id = newRoutine.id, name = newRoutine.name))
@@ -56,7 +80,9 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
             currentList.map { routine ->
                 if (routine.id == routineId && exerciseName.isNotBlank()) {
                     val newMap = routine.exercises.toMutableMap()
-                    newMap[exerciseName] = emptyList()
+                    if (!newMap.containsKey(exerciseName)) {
+                        newMap[exerciseName] = emptyList()
+                    }
                     routine.copy(exercises = newMap)
                 } else routine
             }
@@ -164,5 +190,32 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
             weight >= 60f && reps <= 5 -> 120
             else -> 60
         }
+    }
+
+    fun addRoutineWithExercises(name: String, exerciseName: List<String>, restTime: Int) {
+        if (name.isBlank()) return
+
+        val newRoutineId = UUID.randomUUID().toString()
+        val newRoutineEntity = RoutineEntity(id = newRoutineId, name = name, restTime = restTime)
+
+        val initialSets = exerciseName
+            .filter { it.isNotBlank() }
+            .map { exerciseName->
+                WorkoutSetEntity(
+                    routineId = newRoutineId,
+                    exerciseName = exerciseName,
+                    weight = 0f,
+                    reps = 0,
+                    isChecked = false
+                )
+            }
+
+        viewModelScope.launch {
+            repository.insertRoutine(newRoutineEntity)
+            if (initialSets.isNotEmpty()) {
+                repository.insertSets(initialSets)
+            }
+        }
+
     }
 }
