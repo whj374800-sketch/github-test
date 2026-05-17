@@ -10,7 +10,7 @@ data class RoutineEntity(
     @PrimaryKey val id: String,
     val name: String,
     val date: Long = System.currentTimeMillis(),
-    val restTime: Int = 60
+
 )
 
 @Entity(
@@ -31,5 +31,6 @@ data class WorkoutSetEntity(
     val exerciseName: String,
     val weight: Float,
     val reps: Int,
-    val isChecked: Boolean
+    val isChecked: Boolean,
+    val restTime: Int = 60
 )

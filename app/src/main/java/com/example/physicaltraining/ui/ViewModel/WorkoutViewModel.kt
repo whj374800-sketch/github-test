@@ -16,14 +16,14 @@ data class WorkoutSet(
     val setId: Int = 0,
     val weight: Float,
     val reps: Int,
-    val isChecked: Boolean = false
+    val isChecked: Boolean = false,
+    val restTime: Int = 60
 )
 
 data class DailyRoutine(
     val id: String = UUID.randomUUID().toString(),
     val name: String,
-    val exercises: Map<String, List<WorkoutSet>> = emptyMap(),
-    val restTime: Int= 60
+    val exercises: Map<String, List<WorkoutSet>> = emptyMap()
 )
 
 class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() {
@@ -48,7 +48,8 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
                                     setId = setEntity.setId,
                                     weight = setEntity.weight,
                                     reps = setEntity.reps,
-                                    isChecked = setEntity.isChecked
+                                    isChecked = setEntity.isChecked,
+                                    restTime = setEntity.restTime
                                 )
                             }
                         }
@@ -56,8 +57,7 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
                     DailyRoutine(
                         id = entity.id,
                         name = entity.name,
-                        exercises = exerciseMap,
-                        restTime = entity.restTime
+                        exercises = exerciseMap
 
                     )
                 }
@@ -112,7 +112,8 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
                             exerciseName = exercise,
                             weight = updateSet.weight,
                             reps = updateSet.reps,
-                            isChecked = updateSet.isChecked
+                            isChecked = updateSet.isChecked,
+                            restTime = updateSet.restTime
                         )
                     }
                     routine.copy(exercises = newMap)
@@ -144,7 +145,8 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
                                 exerciseName = exercise,
                                 weight = weight,
                                 reps = reps,
-                                isChecked = false
+                                isChecked = false,
+                                restTime = 60
                             )
                         ))
                     }
@@ -192,21 +194,22 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
         }
     }
 
-    fun addRoutineWithExercises(name: String, exerciseName: List<String>, restTime: Int) {
+    fun addRoutineWithExercises(name: String, exerciseName: List<Pair<String, Int>>) {
         if (name.isBlank()) return
 
         val newRoutineId = UUID.randomUUID().toString()
-        val newRoutineEntity = RoutineEntity(id = newRoutineId, name = name, restTime = restTime)
+        val newRoutineEntity = RoutineEntity(id = newRoutineId, name = name)
 
         val initialSets = exerciseName
-            .filter { it.isNotBlank() }
-            .map { exerciseName->
+            .filter { it.first.isNotBlank() }
+            .map { (exerciseName, exerciseRest) ->
                 WorkoutSetEntity(
                     routineId = newRoutineId,
                     exerciseName = exerciseName,
                     weight = 0f,
                     reps = 0,
-                    isChecked = false
+                    isChecked = false,
+                    restTime = exerciseRest
                 )
             }
 
@@ -218,4 +221,29 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
         }
 
     }
+
+    fun deleteRoutine(routineId: String) {
+        _routines.update { currentList ->
+            currentList.filter { it.id != routineId }
+        }
+
+        viewModelScope.launch {
+            repository.deleteRoutine(RoutineEntity(id = routineId, name = ""))
+        }
+    }
+
+    fun deleteExercise(routineId: String,exerciseName: String) {
+        _routines.update { currentList ->
+            currentList.map { routine ->
+                if ( routine.id == routineId) {
+                    val newExercise = routine.exercises.toMutableMap()
+                    newExercise.remove(exerciseName)
+                    routine.copy(exercises = newExercise)
+                } else routine
+            }
+        }
+    }
+
+
+
 }
