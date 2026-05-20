@@ -16,6 +16,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,47 +32,79 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.physicaltraining.ui.WorkoutViewModel
 import com.example.physicaltraining.ui.screen.CheckListScreen
+import com.example.physicaltraining.ui.screen.RestTimeBar
 import com.example.physicaltraining.ui.screen.RoutineScreen
+import com.example.physicaltraining.ui.screen.TimeoutDialog
 
 @Composable
 fun MainApp(viewModel: WorkoutViewModel) {
     val navController = rememberNavController()
 
-    NavHost(
-        navController = navController,
-        startDestination = AppRoute.Home.route,
-        modifier = Modifier.systemBarsPadding()
-    ) {
-        composable(AppRoute.Home.route) { HomeScreen(navController) }
 
-        composable(AppRoute.RoutineList.route) {
-            RoutineScreen(viewModel = viewModel, navController = navController)
+    val timeLeft by viewModel.restTimerLeft.collectAsState()
+    val isTimerRunning by viewModel.isTimerRunning.collectAsState()
+    val showTimeoutDialog by viewModel.showTimeoutDialog.collectAsState()
+
+    // 전체 화면을 감싸는 하나의 금고(Box)
+    Box(modifier = Modifier.fillMaxSize()) {
+
+
+        NavHost(
+            navController = navController,
+            startDestination = AppRoute.Home.route,
+            modifier = Modifier.systemBarsPadding()
+        ) {
+            composable(AppRoute.Home.route) { HomeScreen(navController) }
+
+
+            composable(AppRoute.RoutineList.route) {
+                RoutineScreen(viewModel = viewModel, navController = navController)
+            }
+
+
+            composable(
+                route = AppRoute.CheckList.route,
+                arguments = listOf(navArgument("routineId") { type = NavType.StringType })
+            ) { backStackEntry ->
+                val routineId = backStackEntry.arguments?.getString("routineId") ?: ""
+                CheckListScreen(routineId = routineId, viewModel = viewModel, navController = navController)
+            }
+
+
+            composable(
+                route = AppRoute.Timer.route,
+                arguments = listOf(
+                    navArgument("exerciseName") { type = NavType.StringType },
+                    navArgument("initialTime") { type = NavType.StringType }
+                )
+            ) { backStackEntry ->
+                val exerciseName = backStackEntry.arguments?.getString("exerciseName") ?: "운동"
+                val initialTime = backStackEntry.arguments?.getString("initialTime")?.toIntOrNull() ?: 60
+                TimerScreen(exerciseName, initialTime, navController)
+            }
+
+            composable(AppRoute.Graph.route) { GraphScreen() }
+            composable(AppRoute.AiSetup.route) { AiSetupScreen() }
         }
 
-        composable(
-            route = AppRoute.CheckList.route,
-            arguments = listOf(navArgument("routineId") { type = NavType.StringType })
-        ) { backStackEntry ->
-            val routineId = backStackEntry.arguments?.getString("routineId") ?: ""
-            CheckListScreen(routineId = routineId, viewModel = viewModel, navController = navController)
-        }
 
-        composable(
-            route = AppRoute.Timer.route,
-            arguments = listOf(
-                navArgument("exerciseName") { type = NavType.StringType },
-                navArgument("initialTime") { type = NavType.StringType }
+        Column(modifier = Modifier.fillMaxWidth()) {
+            RestTimeBar(
+                timeLeft = timeLeft,
+                isRunning = isTimerRunning,
+                onSkip = { viewModel.stopRestTimer() }
             )
-        ) { backStackEntry ->
-            val exerciseName = backStackEntry.arguments?.getString("exerciseName") ?: "운동"
-            val initialTime = backStackEntry.arguments?.getString("initialTime")?.toIntOrNull() ?: 60
-            TimerScreen(exerciseName, initialTime, navController)
         }
 
-        composable(AppRoute.Graph.route) { GraphScreen() }
-        composable(AppRoute.AiSetup.route) { AiSetupScreen() }
+
+        if (showTimeoutDialog) {
+            TimeoutDialog (
+                onDismiss = { viewModel.dismissTimeoutDialog() }
+            )
+        }
     }
 }
+
 
 @Composable
 fun HomeScreen(navController: NavController) {

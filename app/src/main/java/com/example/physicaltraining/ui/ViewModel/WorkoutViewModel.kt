@@ -5,12 +5,15 @@ import androidx.lifecycle.viewModelScope
 import com.example.physicaltraining.data.WorkoutRepository
 import com.example.physicaltraining.data.local.RoutineEntity
 import com.example.physicaltraining.data.local.WorkoutSetEntity
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.UUID
+
 
 data class WorkoutSet(
     val setId: Int = 0,
@@ -27,6 +30,18 @@ data class DailyRoutine(
 )
 
 class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() {
+
+    private var timerJob : Job? = null
+
+    private val _restTimeLeft = MutableStateFlow(0)
+    val restTimerLeft = _restTimeLeft.asStateFlow()
+
+    private val _isTimerRunning = MutableStateFlow(false)
+    val isTimerRunning = _isTimerRunning.asStateFlow()
+
+    private val _showTimeoutDialog = MutableStateFlow(false)
+    val showTimeoutDialog = _showTimeoutDialog.asStateFlow()
+
 
     private val _routines = MutableStateFlow<List<DailyRoutine>>(emptyList())
     val routines = _routines.asStateFlow()
@@ -106,6 +121,10 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
                         currentSets[setIndex] = updateSet
                         newMap[exercise] = currentSets
 
+                        if (updateSet.isChecked) {
+                            startRestTimer(updateSet.restTime)
+                        }
+
                         toggleSEtEntity = WorkoutSetEntity(
                             setId = updateSet.setId,
                             routineId = routineId,
@@ -134,6 +153,8 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
                     val newMap = routine.exercises.toMutableMap()
                     val currentSets = newMap[exercise]?.toMutableList() ?: mutableListOf()
 
+                    val existingRestTime = currentSets.firstOrNull()?.restTime ?: 60
+
                     val newSet = WorkoutSet(weight = weight, reps = reps, isChecked = false)
                     currentSets.add(newSet)
                     newMap[exercise] = currentSets
@@ -146,7 +167,7 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
                                 weight = weight,
                                 reps = reps,
                                 isChecked = false,
-                                restTime = 60
+                                restTime = existingRestTime
                             )
                         ))
                     }
@@ -242,6 +263,34 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
                 } else routine
             }
         }
+    }
+
+    fun startRestTimer(restTime: Int) {
+        timerJob?.cancel()
+
+        _showTimeoutDialog.value = false
+        _restTimeLeft.value = restTime
+        _isTimerRunning.value = true
+
+        timerJob = viewModelScope.launch {
+            while (_restTimeLeft.value > 0) {
+                delay(1000L)
+                _restTimeLeft.value -= 1
+            }
+            _isTimerRunning.value = false
+            _showTimeoutDialog.value = true
+        }
+    }
+
+    fun stopRestTimer()
+    {
+        timerJob?.cancel()
+        _isTimerRunning.value = false
+        _restTimeLeft.value = 0
+    }
+
+    fun dismissTimeoutDialog() {
+        _showTimeoutDialog.value = false
     }
 
 
