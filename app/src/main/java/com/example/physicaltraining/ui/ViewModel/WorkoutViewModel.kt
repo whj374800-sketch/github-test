@@ -2,6 +2,7 @@ package com.example.physicaltraining.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.physicaltraining.WorkoutModelManager
 import com.example.physicaltraining.data.WorkoutRepository
 import com.example.physicaltraining.data.local.RoutineEntity
 import com.example.physicaltraining.data.local.WorkoutSetEntity
@@ -13,7 +14,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.UUID
-
 
 data class WorkoutSet(
     val setId: Int = 0,
@@ -30,6 +30,8 @@ data class DailyRoutine(
 )
 
 class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() {
+
+    private var aiManager : WorkoutModelManager? = null
 
     private var timerJob : Job? = null
 
@@ -49,6 +51,17 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
     init {
         loadRoutinesFromDb()
     }
+
+    fun initAiModel(context : android.content.Context) {
+        if (aiManager == null) {
+            aiManager = WorkoutModelManager(context)
+        }
+    }
+
+    fun getAiRecommendation(inputData : FloatArray) : FloatArray {
+        return aiManager?.predict(inputData) ?: floatArrayOf(0f,0f,0f,0f)
+    }
+
 
     private fun loadRoutinesFromDb() {
         viewModelScope.launch {
@@ -90,14 +103,39 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
         }
     }
 
-    fun addExerciseToRoutine(routineId: String, exerciseName: String) {
+    fun addExerciseToRoutine(routineId: String, exerciseName: String, restTime: Int = 60) {
+        if (exerciseName.isNotBlank()) return
+
         _routines.update { currentList ->
             currentList.map { routine ->
-                if (routine.id == routineId && exerciseName.isNotBlank()) {
+                if (routine.id == routineId ) {
                     val newMap = routine.exercises.toMutableMap()
+
                     if (!newMap.containsKey(exerciseName)) {
-                        newMap[exerciseName] = emptyList()
+                        val initialSet = WorkoutSet(
+                            weight = 0f,
+                            reps = 0,
+                            isChecked = false,
+                            restTime = restTime
+                        )
+                        newMap[exerciseName] = listOf(initialSet)
+
+                        viewModelScope.launch {
+                            repository.insertSets(listOf(
+                                WorkoutSetEntity(
+                                    routineId = routineId,
+                                    exerciseName = exerciseName,
+                                    weight = 0f,
+                                    reps = 0,
+                                    isChecked = false,
+                                    restTime = restTime
+                                )
+                            ))
+                        }
+
                     }
+
+
                     routine.copy(exercises = newMap)
                 } else routine
             }

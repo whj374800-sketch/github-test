@@ -57,6 +57,8 @@ fun CheckListScreen(routineId: String, viewModel: WorkoutViewModel, navControlle
     var showSetDialogFor by remember { mutableStateOf<String?>(null) }
     var inputWeight by remember { mutableStateOf("") }
     var inputReps by remember { mutableStateOf("") }
+    var inputRestTime by remember { mutableStateOf("60") }
+
 
     Scaffold(
         bottomBar = {
@@ -90,7 +92,8 @@ fun CheckListScreen(routineId: String, viewModel: WorkoutViewModel, navControlle
                         ) {
                             Text(text = exercise, style = MaterialTheme.typography.titleLarge, modifier = Modifier.weight(1f))
                             IconButton(onClick = {
-                                navController.navigate(AppRoute.Timer.createRoute(exercise, 60))
+                                val currentRestTime = sets.firstOrNull()?.restTime ?: 60
+                                navController.navigate(AppRoute.Timer.createRoute(exercise,currentRestTime))
                             }) {
                                 Icon(Icons.Default.PlayArrow, "타이머 시작", tint = MaterialTheme.colorScheme.primary)
                             }
@@ -107,8 +110,7 @@ fun CheckListScreen(routineId: String, viewModel: WorkoutViewModel, navControlle
                                 onCheckedChange = { isChecked ->
                                     viewModel.toggleSet(currentRoutine.id, exercise, index)
                                     if (isChecked) {
-                                        val aiTime = viewModel.getAiRestTime(setInfo.weight, setInfo.reps)
-                                        navController.navigate(AppRoute.Timer.createRoute(exercise, aiTime))
+                                        navController.navigate(AppRoute.Timer.createRoute(exercise, setInfo.restTime))
                                     }
                                 }
                             )
@@ -136,17 +138,31 @@ fun CheckListScreen(routineId: String, viewModel: WorkoutViewModel, navControlle
             onDismissRequest = { showAddExerciseDialog = false },
             title = { Text("새로운 운동 종목 추가") },
             text = {
-                OutlinedTextField(
-                    value = inputExerciseName,
-                    onValueChange = { inputExerciseName = it },
-                    label = { Text("운동 이름 (예: 바벨로우)") },
-                    singleLine = true
-                )
+                Column {
+                    OutlinedTextField(
+                        value = inputExerciseName,
+                        onValueChange = { inputExerciseName = it },
+                        label = { Text("운동 이름 (예: 바벨로우)") },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
+                    )
+                    OutlinedTextField(
+                        value = inputRestTime,
+                        onValueChange = { inputRestTime = it },
+                        label = { Text("휴식 시간 (초)") },
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
             },
             confirmButton = {
                 TextButton(onClick = {
+                    val restTimeInt = inputRestTime.toIntOrNull() ?: 60
                     viewModel.addExerciseToRoutine(currentRoutine.id, inputExerciseName)
+
                     inputExerciseName = ""
+                    inputRestTime = "60"
                     showAddExerciseDialog = false
                 }) { Text("추가") }
             },
