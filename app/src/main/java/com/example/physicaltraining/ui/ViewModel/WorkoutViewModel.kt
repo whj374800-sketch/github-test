@@ -337,7 +337,7 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
         _showTimeoutDialog.value = false
     }
 
-    // 변경된 세트 순회형 계산기 연동 함수
+
     fun getRecommendedRoutine(context: Context, userInputs: FloatArray, blueprint : List<RoutineRepository.ExerciseDetail>) : List<CalculatedExercise>
     {
         initModel(context)
@@ -346,7 +346,6 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
 
         val result = calculator.calculateRoutine(aiResult, blueprint)
 
-        // 중요: 계산 결과 구조가 변했으므로 중첩 반복문(forEach)으로 로그를 찍어야 합니다.
         result.forEach { exercise ->
             Log.d("AI_ROUTINE_TEST", "🏋️ 운동 종목: ${exercise.name}")
             exercise.calculatedSets.forEachIndexed { index, set ->
@@ -357,7 +356,61 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
         return result
     }
 
-    fun initModel ( context: Context) {
+    fun applyAiRecommendedRoutine(
+        context: Context,
+        userInputs: FloatArray,
+        routineName: String
+    ) {
+        initModel(context)
+        val aiResult = modelManager?.predict(userInputs) ?: floatArrayOf(0f,0f,0f,0f)
+
+        val calculator = RoutineWeightCalculator()
+        val repoTemplate = RoutineRepository()
+
+        val selectedProgramBlueprint = repoTemplate.allRoutines[routineName] ?: return
+
+        viewModelScope.launch {
+            selectedProgramBlueprint.forEach { (dayOfWeek, exerciseBlueprintList) ->
+
+                if (exerciseBlueprintList.isEmpty()) return@forEach
+
+                val newRoutineId = UUID.randomUUID().toString()
+                val fullRoutineName = "$routineName - $dayOfWeek"
+
+                repository.insertRoutine(
+                    RoutineEntity(id = newRoutineId, name = fullRoutineName)
+                )
+
+                val calculatedExercise = calculator.calculateRoutine(aiResult, exerciseBlueprintList)
+
+                val setEntitiesToInsert = mutableListOf<WorkoutSetEntity>()
+
+                calculatedExercise.forEach { exercise ->
+                    exercise.calculatedSets.forEachIndexed { index, calculatedSet ->
+                        setEntitiesToInsert.add(
+                            WorkoutSetEntity(
+                                routineId = newRoutineId,
+                                exerciseName = exercise.name,
+                                weight = calculatedSet.weight,
+                                reps = calculatedSet.reps,
+                                isChecked = false,
+                                restTime = getAiRestTime(calculatedSet.weight, calculatedSet.reps)
+                            )
+                        )
+                    }
+                }
+
+
+                if (setEntitiesToInsert.isNotEmpty()) {
+                    repository.insertSets(setEntitiesToInsert)
+                }
+            }
+
+            loadRoutinesFromDb()
+        }
+    }
+
+    fun initModel(context: Context) {
         if (modelManager == null) {
             modelManager = WorkoutModelManager(context)
         }
