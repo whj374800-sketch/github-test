@@ -1,15 +1,16 @@
 package com.example.physicaltraining.ui
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.physicaltraining.Ai.WorkoutModelManager
 import com.example.physicaltraining.Domain.CalculatedExercise
-import com.example.physicaltraining.Domain.ExerciseDetail
 import com.example.physicaltraining.Domain.RoutineWeightCalculator
 import com.example.physicaltraining.data.WorkoutRepository
 import com.example.physicaltraining.data.local.RoutineEntity
 import com.example.physicaltraining.data.local.WorkoutSetEntity
+import com.example.physicaltraining.data.template.RoutineRepository
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -35,7 +36,6 @@ data class DailyRoutine(
 )
 
 class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() {
-
 
     private var modelManager : WorkoutModelManager? = null
 
@@ -183,12 +183,12 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
                 } else routine
             }
         }
-                toggleSEtEntity?.let { entity ->
-        viewModelScope.launch{
-            repository.updateSet(entity)
+        toggleSEtEntity?.let { entity ->
+            viewModelScope.launch{
+                repository.updateSet(entity)
+            }
         }
     }
-                }
 
     fun addSet(routineId: String, exercise: String, weight: Float, reps: Int) {
         _routines.update { currentList ->
@@ -337,13 +337,24 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
         _showTimeoutDialog.value = false
     }
 
-    fun getRecommendedRoutine(context: Context, userInputs: FloatArray, blueprint : List<ExerciseDetail>) : List<CalculatedExercise>
+    // 변경된 세트 순회형 계산기 연동 함수
+    fun getRecommendedRoutine(context: Context, userInputs: FloatArray, blueprint : List<RoutineRepository.ExerciseDetail>) : List<CalculatedExercise>
     {
         initModel(context)
         val calculator = RoutineWeightCalculator()
-
         val aiResult = modelManager!!.predict(userInputs)
-        return calculator.calculateRoutine(aiResult, blueprint)
+
+        val result = calculator.calculateRoutine(aiResult, blueprint)
+
+        // 중요: 계산 결과 구조가 변했으므로 중첩 반복문(forEach)으로 로그를 찍어야 합니다.
+        result.forEach { exercise ->
+            Log.d("AI_ROUTINE_TEST", "🏋️ 운동 종목: ${exercise.name}")
+            exercise.calculatedSets.forEachIndexed { index, set ->
+                Log.d("AI_ROUTINE_TEST", "   └ [${index + 1}세트] 무게: ${set.weight}kg / 횟수: ${set.reps}회")
+            }
+        }
+
+        return result
     }
 
     fun initModel ( context: Context) {
@@ -352,12 +363,8 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
         }
     }
 
-
-
     override fun onCleared() {
         super.onCleared()
         modelManager?.close()
     }
-
-
 }

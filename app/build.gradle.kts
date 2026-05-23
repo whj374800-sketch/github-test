@@ -7,9 +7,7 @@ plugins {
 
 android {
     namespace = "com.example.physicaltraining"
-    compileSdk {
-        version = release(36)
-    }
+   compileSdk = 36
 
     defaultConfig {
         applicationId = "com.example.physicaltraining"
@@ -19,6 +17,10 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    ksp {
+        arg("room.schemaLocation", "$projectDir/schemas")
     }
 
     buildTypes {
@@ -50,7 +52,6 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
-    implementation(libs.androidx.room.compiler)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.generativeai)
     ksp(libs.androidx.room.compiler)
@@ -62,9 +63,12 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     implementation(libs.androidx.navigation.compose)
-    implementation("org.tensorflow:tensorflow-lite:2.14.0")
+    implementation("org.tensorflow:tensorflow-lite:2.17.0")
+    implementation("io.coil-kt:coil-compose:2.6.0")
+    implementation("io.coil-kt:coil-gif:2.6.0")
 
     configurations.all {
         exclude(group = "com.intellij", module = "annotations")
+
     }
 }
