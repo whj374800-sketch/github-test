@@ -1,8 +1,12 @@
 package com.example.physicaltraining.ui
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.physicaltraining.WorkoutModelManager
+import com.example.physicaltraining.Ai.WorkoutModelManager
+import com.example.physicaltraining.Domain.CalculatedExercise
+import com.example.physicaltraining.Domain.ExerciseDetail
+import com.example.physicaltraining.Domain.RoutineWeightCalculator
 import com.example.physicaltraining.data.WorkoutRepository
 import com.example.physicaltraining.data.local.RoutineEntity
 import com.example.physicaltraining.data.local.WorkoutSetEntity
@@ -14,6 +18,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.UUID
+
 
 data class WorkoutSet(
     val setId: Int = 0,
@@ -31,7 +36,8 @@ data class DailyRoutine(
 
 class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() {
 
-    private var aiManager : WorkoutModelManager? = null
+
+    private var modelManager : WorkoutModelManager? = null
 
     private var timerJob : Job? = null
 
@@ -53,13 +59,13 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
     }
 
     fun initAiModel(context : android.content.Context) {
-        if (aiManager == null) {
-            aiManager = WorkoutModelManager(context)
+        if (modelManager == null) {
+            modelManager = WorkoutModelManager(context)
         }
     }
 
     fun getAiRecommendation(inputData : FloatArray) : FloatArray {
-        return aiManager?.predict(inputData) ?: floatArrayOf(0f,0f,0f,0f)
+        return modelManager?.predict(inputData) ?: floatArrayOf(0f,0f,0f,0f)
     }
 
 
@@ -331,6 +337,27 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
         _showTimeoutDialog.value = false
     }
 
+    fun getRecommendedRoutine(context: Context, userInputs: FloatArray, blueprint : List<ExerciseDetail>) : List<CalculatedExercise>
+    {
+        initModel(context)
+        val calculator = RoutineWeightCalculator()
+
+        val aiResult = modelManager!!.predict(userInputs)
+        return calculator.calculateRoutine(aiResult, blueprint)
+    }
+
+    fun initModel ( context: Context) {
+        if (modelManager == null) {
+            modelManager = WorkoutModelManager(context)
+        }
+    }
+
+
+
+    override fun onCleared() {
+        super.onCleared()
+        modelManager?.close()
+    }
 
 
 }

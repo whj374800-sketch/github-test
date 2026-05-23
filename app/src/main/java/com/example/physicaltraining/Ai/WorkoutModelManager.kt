@@ -1,4 +1,4 @@
-package com.example.physicaltraining
+package com.example.physicaltraining.Ai
 
 import android.content.Context
 import org.tensorflow.lite.Interpreter
@@ -26,7 +26,12 @@ class WorkoutModelManager(private val context: Context) {
 
     fun predict(inputData: FloatArray): FloatArray {
         val output = Array(1) { FloatArray(4) }
-        interpreter?.run(inputData, output)
+        interpreter?.run(arrayOf(inputData), output)
         return output[0]
     }
+    fun close() {
+        interpreter?.close()
+        interpreter = null
+    }
+
 }
