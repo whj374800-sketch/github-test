@@ -25,9 +25,24 @@ class WorkoutModelManager(private val context: Context) {
     }
 
     fun predict(inputData: FloatArray): FloatArray {
-        val output = Array(1) { FloatArray(4) }
-        interpreter?.run(arrayOf(inputData), output)
-        return output[0]
+
+      if (interpreter == null) {
+          return  floatArrayOf(0f,0f,0f,0f)
+      }
+
+        try {
+            val inputArray = arrayOf(inputData)
+
+            val outputArray = Array(1) { FloatArray(4) }
+
+            interpreter?.run (inputArray, outputArray)
+
+            return outputArray[0]
+
+        } catch (e: Exception) {
+            return  floatArrayOf(0f,0f,0f,0f)
+        }
+
     }
     fun close() {
         interpreter?.close()

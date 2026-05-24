@@ -44,7 +44,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewModelScope
 import com.example.physicaltraining.ui.WorkoutViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -55,7 +54,7 @@ fun WorkoutInputScreen(
     onCalculationComplete: () -> Unit = {}
 ) {
     val scrollState = rememberScrollState()
-
+    val context = androidx.compose.ui.platform.LocalContext.current
 
     var gender by remember { mutableStateOf("남성") }
     var weight by remember { mutableStateOf("") }
@@ -241,20 +240,24 @@ fun WorkoutInputScreen(
             Button(
                 onClick = {
                     val userWeight = weight.toFloatOrNull() ?: 60f
+                    val userAge = age.toFloatOrNull() ?: 25f
+
                     val aiInputData = floatArrayOf(
                         if (gender == "남성") 1f else 0f,
                         userWeight,
+                        userAge,
                         if (experience == "상급자") 3f else if (experience == "중급자") 2f else 1f,
                         if (goal == "스트렝스") 1f else 0f
                     )
 
                     viewModel.applyAiRecommendedRoutine(
-                        context = viewModel.viewModelScope.coroutineContext as? android.content.Context ?: return@Button,
+                        context = context,
                         userInputs = aiInputData,
-                        routineName = selectedRoutineName
+                        routineName = selectedRoutineName,
+                        onComplete = {
+                            onCalculationComplete()
+                        }
                     )
-
-                    onCalculationComplete()
                 },
                 modifier = Modifier.fillMaxWidth().height(50.dp)
             ) {

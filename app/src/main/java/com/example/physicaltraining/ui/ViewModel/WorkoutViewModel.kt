@@ -359,10 +359,14 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
     fun applyAiRecommendedRoutine(
         context: Context,
         userInputs: FloatArray,
-        routineName: String
+        routineName: String,
+        onComplete: () -> Unit
     ) {
         initModel(context)
         val aiResult = modelManager?.predict(userInputs) ?: floatArrayOf(0f,0f,0f,0f)
+
+        android.util.Log.d("AI_TEST", "👉 1. AI에게 보낸 입력값: ${userInputs.contentToString()}")
+        android.util.Log.d("AI_TEST", "🚨 2. AI가 뱉어낸 진짜 결과값: ${aiResult.contentToString()}")
 
         val calculator = RoutineWeightCalculator()
         val repoTemplate = RoutineRepository()
@@ -400,13 +404,15 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
                     }
                 }
 
-
                 if (setEntitiesToInsert.isNotEmpty()) {
                     repository.insertSets(setEntitiesToInsert)
                 }
             }
 
             loadRoutinesFromDb()
+
+
+            onComplete()
         }
     }
 
