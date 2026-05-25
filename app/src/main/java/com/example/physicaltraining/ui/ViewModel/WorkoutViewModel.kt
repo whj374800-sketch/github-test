@@ -9,6 +9,7 @@ import com.example.physicaltraining.Domain.CalculatedExercise
 import com.example.physicaltraining.Domain.RoutineWeightCalculator
 import com.example.physicaltraining.data.WorkoutRepository
 import com.example.physicaltraining.data.local.RoutineEntity
+import com.example.physicaltraining.data.local.UserProfileEntity
 import com.example.physicaltraining.data.local.WorkoutSetEntity
 import com.example.physicaltraining.data.template.RoutineRepository
 import kotlinx.coroutines.Job
@@ -54,8 +55,14 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
     private val _routines = MutableStateFlow<List<DailyRoutine>>(emptyList())
     val routines = _routines.asStateFlow()
 
+    private val _userProfile =
+        MutableStateFlow<UserProfileEntity?>(null)
+
+    val userProfile = _userProfile.asStateFlow()
+
     init {
         loadRoutinesFromDb()
+        loadUserProfile()
     }
 
     fun initAiModel(context : android.content.Context) {
@@ -250,15 +257,6 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
     }
 
 
-
-    fun getAiRestTime(weight: Float, reps: Int): Int {
-        return when {
-            weight >= 100f -> 100
-            weight >= 60f && reps <= 5 -> 120
-            else -> 60
-        }
-    }
-
     fun addRoutineWithExercises(name: String, exerciseName: List<Pair<String, Int>>) {
         if (name.isBlank()) return
 
@@ -398,7 +396,7 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
                                 weight = calculatedSet.weight,
                                 reps = calculatedSet.reps,
                                 isChecked = false,
-                                restTime = getAiRestTime(calculatedSet.weight, calculatedSet.reps)
+                                restTime = calculatedSet.restTime
                             )
                         )
                     }
@@ -425,5 +423,30 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
     override fun onCleared() {
         super.onCleared()
         modelManager?.close()
+    }
+
+
+    fun saveUserProfile(
+        age: Int,
+        weight: Float,
+        gender: String
+    ) {
+        viewModelScope.launch {
+
+            val profile = UserProfileEntity(
+                age = age,
+                weight = weight,
+                gender = gender
+            )
+
+            repository.saveUserProfile(profile)
+
+            _userProfile.value = profile
+        }
+    }
+    private fun loadUserProfile() {
+        viewModelScope.launch {
+            _userProfile.value = repository.getUserProfile()
+        }
     }
 }

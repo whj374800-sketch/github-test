@@ -33,4 +33,10 @@ interface WorkoutDao {
 
     @Query("DELETE FROM workout_sets WHERE setId = :setId")
     suspend fun deleteSetById(setId: Int)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun saveUserProfile(profile: UserProfileEntity)
+
+    @Query("SELECT * FROM user_profile WHERE id = 0")
+    suspend fun getUserProfile(): UserProfileEntity?
 }

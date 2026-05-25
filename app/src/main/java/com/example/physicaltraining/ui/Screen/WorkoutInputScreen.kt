@@ -34,6 +34,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -50,17 +51,23 @@ import com.example.physicaltraining.ui.WorkoutViewModel
 @Composable
 fun WorkoutInputScreen(
     viewModel: WorkoutViewModel,
-    userName: String = "홍길동",
+    userName: String = "우재훈",
     onCalculationComplete: () -> Unit = {}
+
 ) {
+
     val scrollState = rememberScrollState()
     val context = androidx.compose.ui.platform.LocalContext.current
 
-    var gender by remember { mutableStateOf("남성") }
-    var weight by remember { mutableStateOf("") }
+    val profile by viewModel.userProfile.collectAsState()
+
+    var gender by remember { mutableStateOf(profile?.gender ?:"남성") }
+    var weight by remember { mutableStateOf(profile?.weight?.toString() ?: "") }
 
 
-    var age by remember { mutableStateOf("") }
+    var age by remember {
+        mutableStateOf(profile?.age?.toString() ?: "")
+    }
 
 
     var experience by remember { mutableStateOf("초보자") }
@@ -241,6 +248,13 @@ fun WorkoutInputScreen(
                 onClick = {
                     val userWeight = weight.toFloatOrNull() ?: 60f
                     val userAge = age.toFloatOrNull() ?: 25f
+
+                    viewModel.saveUserProfile(
+                        age = userAge.toInt(),
+                        weight = userWeight,
+                        gender = gender
+
+                    )
 
                     val aiInputData = floatArrayOf(
                         if (gender == "남성") 1f else 0f,

@@ -1,19 +1,17 @@
 package com.example.physicaltraining.Domain
 
-import com.example.physicaltraining.data.template.RoutineRepository // 패키지 경로에 맞게 확인
+import com.example.physicaltraining.data.template.RoutineRepository
 import kotlin.math.roundToInt
-
 
 enum class BaseLift {
     BENCH, SQUAT, DEADLIFT, OHP, NONE
 }
 
-
 data class CalculatedSet(
     val weight: Float,
-    val reps: Int
+    val reps: Int,
+    val restTime: Int
 )
-
 
 data class CalculatedExercise(
     val name: String,
@@ -27,23 +25,19 @@ class RoutineWeightCalculator {
         return (weight / 2.5f).roundToInt() * 2.5f
     }
 
-
     fun calculateRoutine(
         aiResult: FloatArray,
         routineBlueprint: List<RoutineRepository.ExerciseDetail>
     ): List<CalculatedExercise> {
 
-
         val bench1RM = aiResult[0]
         val squat1RM = aiResult[1]
         val deadlift1RM = aiResult[2]
-
+        val aiRestAdjustment = aiResult[3]
 
         val ohp1RM = bench1RM * 0.65f
 
-
         return routineBlueprint.map { exercise ->
-
 
             val baseWeight = when (exercise.baseLift) {
                 BaseLift.BENCH -> bench1RM
@@ -53,11 +47,12 @@ class RoutineWeightCalculator {
                 BaseLift.NONE -> 0f
             }
 
+            // 💡 꼼수(getattr) 버리고 1단계에서 추가한 변수를 직접 호출!
+            val specificExercise1RM = baseWeight * exercise.derivativeRatio
 
             val calculatedSets = exercise.sets.map { setDetail ->
 
-                val rawWeight = baseWeight * setDetail.ratio
-
+                val rawWeight = specificExercise1RM * setDetail.ratio
 
                 val finalWeight = if (exercise.baseLift == BaseLift.NONE) {
                     0f
@@ -66,12 +61,14 @@ class RoutineWeightCalculator {
                 }
 
 
+                val finalRestTime = maxOf(30, (exercise.defaultRestTime + aiRestAdjustment).toInt())
+
                 CalculatedSet(
                     weight = finalWeight,
-                    reps = setDetail.reps
+                    reps = setDetail.reps,
+                    restTime = finalRestTime
                 )
             }
-
 
             CalculatedExercise(
                 name = exercise.name,

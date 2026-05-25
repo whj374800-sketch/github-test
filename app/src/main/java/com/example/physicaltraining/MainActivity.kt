@@ -20,7 +20,7 @@ class MainActivity : ComponentActivity() {
             AppDatabase::class.java,
             "workout_db"
         )
-
+            .fallbackToDestructiveMigration()
             .build()
 
         val repository = WorkoutRepository(database.workoutDao())

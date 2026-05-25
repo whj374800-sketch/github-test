@@ -1,6 +1,7 @@
 package com.example.physicaltraining.data
 
 import com.example.physicaltraining.data.local.RoutineEntity
+import com.example.physicaltraining.data.local.UserProfileEntity
 import com.example.physicaltraining.data.local.WorkoutDao
 import com.example.physicaltraining.data.local.WorkoutSetEntity
 import kotlinx.coroutines.flow.Flow
@@ -35,6 +36,13 @@ class WorkoutRepository(private val workoutDao: WorkoutDao) {
 
     suspend fun deleteSetById(setId: Int) {
         workoutDao.deleteSetById(setId)
+    }
+    suspend fun saveUserProfile(profile: UserProfileEntity) {
+        workoutDao.saveUserProfile(profile)
+    }
+
+    suspend fun getUserProfile(): UserProfileEntity? {
+        return workoutDao.getUserProfile()
     }
 
 }
