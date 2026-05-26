@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.physicaltraining.Ai.WorkoutModelManager
 import com.example.physicaltraining.Domain.CalculatedExercise
+import com.example.physicaltraining.Domain.ProgressionManager
 import com.example.physicaltraining.Domain.RoutineWeightCalculator
 import com.example.physicaltraining.data.WorkoutRepository
 import com.example.physicaltraining.data.local.RoutineEntity
@@ -20,6 +21,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.UUID
+
 
 
 data class WorkoutSet(
@@ -449,4 +451,37 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
             _userProfile.value = repository.getUserProfile()
         }
     }
+
+    fun completeRoutineAndUpdateWeights(routineId: String) {
+
+        val routine =
+            _routines.value.find { it.id == routineId }
+                ?: return
+
+        routine.exercises.forEach { (exerciseName, sets) ->
+
+            val allSetsSuccess =
+                sets.all { it.isChecked}
+
+            val lastSet =
+                sets.lastOrNull()
+                    ?: return@forEach
+
+            val nextWeight =
+                ProgressionManager.calculateNextWeight(
+                    routineName = routine.name,
+                    exerciseName = exerciseName,
+                    currentWeight = lastSet.weight,
+                    allSetsSuccess = allSetsSuccess,
+                    currentReps = lastSet.reps,
+                    targetReps = lastSet.reps
+                )
+
+            Log.d(
+                "PROGRESSION_TEST",
+                "$exerciseName : 현재 ${lastSet.weight}kg -> 다음 $nextWeight kg"
+            )
+        }
+    }
+
 }

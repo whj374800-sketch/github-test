@@ -30,12 +30,12 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.physicaltraining.ui.screen.WorkoutInputScreen
 import com.example.physicaltraining.ui.WorkoutViewModel
 import com.example.physicaltraining.ui.screen.CheckListScreen
 import com.example.physicaltraining.ui.screen.RestTimeBar
 import com.example.physicaltraining.ui.screen.RoutineScreen
 import com.example.physicaltraining.ui.screen.TimeoutDialog
+import com.example.physicaltraining.ui.screen.WorkoutInputScreen
 
 
 @Composable
@@ -85,7 +85,11 @@ fun MainApp(viewModel: WorkoutViewModel) {
                 TimerScreen(exerciseName, initialTime, navController)
             }
 
-            composable(AppRoute.Graph.route) { GraphScreen() }
+            composable(AppRoute.Graph.route) {
+                GraphScreen(viewModel = viewModel) }
+
+
+
             composable(AppRoute.AiSetup.route) {
                 WorkoutInputScreen(
                     viewModel = viewModel,
@@ -182,5 +186,3 @@ fun TimerScreen(exerciseName: String, initialTime: Int, navController: NavContro
     }
 }
 
-@Composable
-fun GraphScreen() { Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { Text("성장 그래프 화면") } }
