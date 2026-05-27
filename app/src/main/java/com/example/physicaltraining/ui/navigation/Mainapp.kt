@@ -18,9 +18,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -57,7 +54,12 @@ fun MainApp(viewModel: WorkoutViewModel) {
             startDestination = AppRoute.Home.route,
             modifier = Modifier.systemBarsPadding()
         ) {
-            composable(AppRoute.Home.route) { HomeScreen(navController) }
+            composable(AppRoute.Home.route) {
+                HomeScreen(
+                    navController = navController,
+                    viewModel = viewModel
+                )
+            }
 
 
             composable(AppRoute.RoutineList.route) {
@@ -83,7 +85,11 @@ fun MainApp(viewModel: WorkoutViewModel) {
             ) { backStackEntry ->
                 val exerciseName = backStackEntry.arguments?.getString("exerciseName") ?: "운동"
                 val initialTime = backStackEntry.arguments?.getString("initialTime")?.toIntOrNull() ?: 60
-                TimerScreen(exerciseName, initialTime, navController)
+                TimerScreen(
+                    exerciseName = exerciseName,
+                    initialTime = initialTime,
+                    navController = navController,
+                    viewModel = viewModel)
             }
 
             composable(AppRoute.Graph.route) {
@@ -126,7 +132,10 @@ fun MainApp(viewModel: WorkoutViewModel) {
 
 
 @Composable
-fun HomeScreen(navController: NavController) {
+fun HomeScreen(
+    navController: NavController,
+    viewModel: WorkoutViewModel
+) {
     Column(
         modifier = Modifier.fillMaxSize().padding(16.dp),
         verticalArrangement = Arrangement.Center,
@@ -139,6 +148,7 @@ fun HomeScreen(navController: NavController) {
         HomeButton("휴식 타이머") { navController.navigate(AppRoute.Timer.createRoute("자유 휴식", 60)) }
         HomeButton("성장 그래프") { navController.navigate(AppRoute.Graph.route) }
         HomeButton("AI 무게 설정") { navController.navigate(AppRoute.AiSetup.route) }
+        HomeButton("Firebase 백업") { viewModel.backupWorkoutHistoryToFirebase()}
     }
 }
 
@@ -153,14 +163,24 @@ fun HomeButton(text: String, onClick: () -> Unit) {
 }
 
 @Composable
-fun TimerScreen(exerciseName: String, initialTime: Int, navController: NavController) {
-    var timeLeft by remember { mutableStateOf(initialTime) }
-    var isRunning by remember { mutableStateOf(true) }
+fun TimerScreen(
+    exerciseName: String,
+    initialTime: Int,
+    navController: NavController,
+    viewModel: WorkoutViewModel
+) {
+    val timeLeft by viewModel.restTimerLeft.collectAsState()
+    val isRunning by viewModel.isTimerRunning.collectAsState()
 
-    LaunchedEffect(key1 = isRunning) {
-        while (isRunning && timeLeft > 0) {
-            kotlinx.coroutines.delay(1000L)
-            timeLeft--
+    LaunchedEffect(Unit) {
+        if (!isRunning && timeLeft <= 0) {
+            viewModel.startRestTimer(initialTime)
+        }
+    }
+
+    LaunchedEffect(isRunning, timeLeft) {
+        if (!isRunning && timeLeft <= 0) {
+            navController.popBackStack()
         }
     }
 
@@ -171,19 +191,45 @@ fun TimerScreen(exerciseName: String, initialTime: Int, navController: NavContro
     ) {
         Text(text = exerciseName, style = MaterialTheme.typography.headlineMedium)
         Text(text = "휴식 중", style = MaterialTheme.typography.bodyLarge)
+
         Spacer(modifier = Modifier.height(32.dp))
+
         Text(
             text = String.format("%02d:%02d", timeLeft / 60, timeLeft % 60),
             style = MaterialTheme.typography.displayLarge
         )
+
         Spacer(modifier = Modifier.height(24.dp))
+
         Row {
-            Button(onClick = { timeLeft = (timeLeft - 10).coerceAtLeast(0) }) { Text("-10초") }
+            Button(
+                onClick = {
+                    viewModel.adjustRestTimer(-10)
+                }
+            ) {
+                Text("-10초")
+            }
+
             Spacer(modifier = Modifier.width(16.dp))
-            Button(onClick = { timeLeft += 10 }) { Text("+10초") }
+
+            Button(
+                onClick = {
+                    viewModel.adjustRestTimer(10)
+                }
+            ) {
+                Text("+10초")
+            }
         }
+
         Spacer(modifier = Modifier.height(48.dp))
-        Button(onClick = { navController.popBackStack() }) { Text("휴식 완료") }
+
+        Button(
+            onClick = {
+                viewModel.stopRestTimer()
+                navController.popBackStack()
+            }
+        ) {
+            Text("휴식 완료")
+        }
     }
 }
-

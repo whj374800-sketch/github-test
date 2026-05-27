@@ -347,6 +347,16 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
         _restTimeLeft.value = 0
     }
 
+    fun adjustRestTimer(seconds: Int) {
+        _restTimeLeft.value = (_restTimeLeft.value + seconds).coerceAtLeast(0)
+
+        if (_restTimeLeft.value == 0) {
+            timerJob?.cancel()
+            _isTimerRunning.value = false
+            _showTimeoutDialog.value = true
+        }
+    }
+
     fun dismissTimeoutDialog() {
         _showTimeoutDialog.value = false
     }
@@ -594,6 +604,21 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
         viewModelScope.launch {
             repository.getAllWorkoutHistory().collect {
                 _workoutHistory.value = it
+            }
+        }
+    }
+
+    fun backupWorkoutHistoryToFirebase(userId: String = "test_user") {
+        viewModelScope.launch {
+            try {
+                repository.backupWorkoutHistoryToFirebase(
+                    userId = userId,
+                    historyList = _workoutHistory.value
+                )
+
+                Log.d("FIREBASE_BACKUP", "운동 히스토리 백업 성공")
+            } catch (e: Exception) {
+                Log.e("FIREBASE_BACKUP", "운동 히스토리 백업 실패", e)
             }
         }
     }

@@ -1,5 +1,6 @@
 package com.example.physicaltraining.ui.screen
 
+import android.graphics.Paint
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -10,15 +11,24 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.unit.dp
 import com.example.physicaltraining.ui.WorkoutViewModel
 import java.text.SimpleDateFormat
@@ -31,6 +41,7 @@ data class WeeklyGraphPoint(
     val volume: Float
 )
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GraphScreen(viewModel: WorkoutViewModel) {
     val workoutHistory by viewModel.workoutHistory.collectAsState()
@@ -43,10 +54,11 @@ fun GraphScreen(viewModel: WorkoutViewModel) {
         "바벨 로우"
     )
 
+    var selectedExercise by remember { mutableStateOf("벤치프레스") }
+    var expanded by remember { mutableStateOf(false) }
+
     val filteredHistory = workoutHistory.filter { history ->
-        targetExercises.any { target ->
-            history.exerciseName.contains(target)
-        }
+        history.exerciseName.contains(selectedExercise)
     }
 
     val weeklyGraphData = filteredHistory
@@ -93,6 +105,41 @@ fun GraphScreen(viewModel: WorkoutViewModel) {
 
         Spacer(modifier = Modifier.height(24.dp))
 
+        ExposedDropdownMenuBox(
+            expanded = expanded,
+            onExpandedChange = { expanded = !expanded }
+        ) {
+            OutlinedTextField(
+                value = selectedExercise,
+                onValueChange = {},
+                readOnly = true,
+                label = { Text("운동 선택") },
+                trailingIcon = {
+                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                },
+                modifier = Modifier
+                    .menuAnchor()
+                    .fillMaxWidth()
+            )
+
+            ExposedDropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false }
+            ) {
+                targetExercises.forEach { exercise ->
+                    DropdownMenuItem(
+                        text = { Text(exercise) },
+                        onClick = {
+                            selectedExercise = exercise
+                            expanded = false
+                        }
+                    )
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
+
         if (weeklyGraphData.isEmpty()) {
             Text(
                 text = "아직 완료된 운동 히스토리가 없습니다.\n루틴을 완료하면 그래프가 표시됩니다.",
@@ -108,6 +155,7 @@ fun GraphScreen(viewModel: WorkoutViewModel) {
 
             VolumeLineChart(
                 data = weightData,
+                suffix = "kg",
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(280.dp)
@@ -129,6 +177,7 @@ fun GraphScreen(viewModel: WorkoutViewModel) {
 
             VolumeLineChart(
                 data = volumeData,
+                suffix = "",
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(280.dp)
@@ -155,6 +204,7 @@ fun GraphScreen(viewModel: WorkoutViewModel) {
 @Composable
 fun VolumeLineChart(
     data: List<Pair<String, Float>>,
+    suffix: String = "",
     modifier: Modifier = Modifier
 ) {
     val primaryColor = MaterialTheme.colorScheme.primary
@@ -169,13 +219,27 @@ fun VolumeLineChart(
         val graphWidth = size.width
         val graphHeight = size.height
 
-        val leftPadding = 40f
-        val bottomPadding = 40f
-        val topPadding = 20f
-        val rightPadding = 20f
+        val leftPadding = 48f
+        val bottomPadding = 48f
+        val topPadding = 32f
+        val rightPadding = 24f
 
         val usableWidth = graphWidth - leftPadding - rightPadding
         val usableHeight = graphHeight - topPadding - bottomPadding
+
+        val labelPaint = Paint().apply {
+            color = android.graphics.Color.DKGRAY
+            textSize = 26f
+            textAlign = Paint.Align.CENTER
+            isAntiAlias = true
+        }
+
+        val axisPaint = Paint().apply {
+            color = android.graphics.Color.GRAY
+            textSize = 22f
+            textAlign = Paint.Align.RIGHT
+            isAntiAlias = true
+        }
 
         drawLine(
             color = gridColor,
@@ -189,6 +253,20 @@ fun VolumeLineChart(
             start = Offset(leftPadding, graphHeight - bottomPadding),
             end = Offset(graphWidth - rightPadding, graphHeight - bottomPadding),
             strokeWidth = 3f
+        )
+
+        drawContext.canvas.nativeCanvas.drawText(
+            maxValue.toInt().toString(),
+            leftPadding - 8f,
+            topPadding + 8f,
+            axisPaint
+        )
+
+        drawContext.canvas.nativeCanvas.drawText(
+            "0",
+            leftPadding - 8f,
+            graphHeight - bottomPadding,
+            axisPaint
         )
 
         val points = data.mapIndexed { index, item ->
@@ -214,7 +292,7 @@ fun VolumeLineChart(
             )
         }
 
-        points.forEach { point ->
+        points.forEachIndexed { index, point ->
             drawCircle(
                 color = primaryColor,
                 radius = 9f,
@@ -226,6 +304,20 @@ fun VolumeLineChart(
                 radius = 18f,
                 center = point,
                 style = Stroke(width = 4f)
+            )
+
+            drawContext.canvas.nativeCanvas.drawText(
+                "${data[index].second.toInt()}$suffix",
+                point.x,
+                point.y - 16f,
+                labelPaint
+            )
+
+            drawContext.canvas.nativeCanvas.drawText(
+                data[index].first,
+                point.x,
+                graphHeight - 8f,
+                labelPaint
             )
         }
     }

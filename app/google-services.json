@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "412786492772",
+    "project_id": "physical-training-81115",
+    "storage_bucket": "physical-training-81115.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:412786492772:android:35a3afe79c637c5b622671",
+        "android_client_info": {
+          "package_name": "com.example.physicaltraining"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAtM5CTvwWql-290sSdK5t53IPWrMvoJ1U"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

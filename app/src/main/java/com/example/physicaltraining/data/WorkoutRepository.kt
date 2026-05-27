@@ -5,9 +5,13 @@ import com.example.physicaltraining.data.local.UserProfileEntity
 import com.example.physicaltraining.data.local.WorkoutDao
 import com.example.physicaltraining.data.local.WorkoutHistoryEntity
 import com.example.physicaltraining.data.local.WorkoutSetEntity
+import com.example.physicaltraining.data.remote.FirebaseWorkoutRepository
 import kotlinx.coroutines.flow.Flow
 
-class WorkoutRepository(private val workoutDao: WorkoutDao) {
+class WorkoutRepository(
+    private val workoutDao: WorkoutDao,
+    private val firebaseWorkoutRepository: FirebaseWorkoutRepository
+) {
 
     val allRoutines: Flow<List<RoutineEntity>> = workoutDao.getAllRoutines()
 
@@ -38,6 +42,7 @@ class WorkoutRepository(private val workoutDao: WorkoutDao) {
     suspend fun deleteSetById(setId: Int) {
         workoutDao.deleteSetById(setId)
     }
+
     suspend fun saveUserProfile(profile: UserProfileEntity) {
         workoutDao.saveUserProfile(profile)
     }
@@ -62,4 +67,13 @@ class WorkoutRepository(private val workoutDao: WorkoutDao) {
         workoutDao.insertWorkoutHistory(history)
     }
 
+    suspend fun backupWorkoutHistoryToFirebase(
+        userId: String,
+        historyList: List<WorkoutHistoryEntity>
+    ) {
+        firebaseWorkoutRepository.uploadWorkoutHistory(
+            userId = userId,
+            historyList = historyList
+        )
+    }
 }

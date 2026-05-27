@@ -8,8 +8,10 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.room.Room
 import com.example.physicaltraining.data.WorkoutRepository
 import com.example.physicaltraining.data.local.AppDatabase
+import com.example.physicaltraining.data.remote.FirebaseWorkoutRepository
 import com.example.physicaltraining.ui.WorkoutViewModel
 import com.example.physicaltraining.ui.navigation.MainApp
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -23,7 +25,12 @@ class MainActivity : ComponentActivity() {
             .fallbackToDestructiveMigration()
             .build()
 
-        val repository = WorkoutRepository(database.workoutDao())
+        val firebaseWorkoutRepository = FirebaseWorkoutRepository()
+
+        val repository = WorkoutRepository(
+            workoutDao = database.workoutDao(),
+            firebaseWorkoutRepository = firebaseWorkoutRepository
+        )
 
         val viewModelFactory = object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
