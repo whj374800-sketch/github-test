@@ -21,23 +21,57 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.dp
 import com.example.physicaltraining.ui.WorkoutViewModel
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
+data class WeeklyGraphPoint(
+    val weekLabel: String,
+    val maxWeight: Float,
+    val volume: Float
+)
 
 @Composable
-
 fun GraphScreen(viewModel: WorkoutViewModel) {
-    val routines by viewModel.routines.collectAsState()
+    val workoutHistory by viewModel.workoutHistory.collectAsState()
 
-    val graphData = routines.map { routine ->
-        val totalVolume = routine.exercises.values
-            .flatten()
-            .filter { it.isChecked }
-            .sumOf { (it.weight * it.reps).toDouble() }
-            .toFloat()
+    val targetExercises = listOf(
+        "스쿼트",
+        "벤치프레스",
+        "데드리프트",
+        "오버헤드 프레스",
+        "바벨 로우"
+    )
 
-        routine.name to totalVolume
+    val filteredHistory = workoutHistory.filter { history ->
+        targetExercises.any { target ->
+            history.exerciseName.contains(target)
+        }
+    }
 
-    }.filter { it.second > 0f }
+    val weeklyGraphData = filteredHistory
+        .groupBy { history ->
+            SimpleDateFormat("yyyy-ww", Locale.getDefault())
+                .format(Date(history.completedAt))
+        }
+        .map { (week, histories) ->
+            WeeklyGraphPoint(
+                weekLabel = week,
+                maxWeight = histories.maxOf { it.weight },
+                volume = histories.sumOf {
+                    (it.weight * it.reps).toDouble()
+                }.toFloat()
+            )
+        }
+        .sortedBy { it.weekLabel }
+
+    val weightData = weeklyGraphData.map {
+        it.weekLabel to it.maxWeight
+    }
+
+    val volumeData = weeklyGraphData.map {
+        it.weekLabel to it.volume
+    }
 
     Column(
         modifier = Modifier
@@ -53,20 +87,27 @@ fun GraphScreen(viewModel: WorkoutViewModel) {
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = "완료한 세트 기준으로 운동 볼륨(무게 × 횟수)을 계산합니다.",
+            text = "5대 운동의 주차별 최고 중량과 총 볼륨 변화를 확인합니다.",
             style = MaterialTheme.typography.bodyMedium
         )
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        if (graphData.isEmpty()) {
+        if (weeklyGraphData.isEmpty()) {
             Text(
-                text = "아직 완료된 운동 데이터가 없습니다.\n체크리스트에서 세트를 완료하면 그래프가 표시됩니다.",
+                text = "아직 완료된 운동 히스토리가 없습니다.\n루틴을 완료하면 그래프가 표시됩니다.",
                 style = MaterialTheme.typography.bodyLarge
             )
         } else {
+            Text(
+                text = "주차별 최고 중량",
+                style = MaterialTheme.typography.titleLarge
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
             VolumeLineChart(
-                data = graphData,
+                data = weightData,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(280.dp)
@@ -79,9 +120,30 @@ fun GraphScreen(viewModel: WorkoutViewModel) {
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            graphData.forEachIndexed { index, item ->
+            Text(
+                text = "주차별 총 볼륨",
+                style = MaterialTheme.typography.titleLarge
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            VolumeLineChart(
+                data = volumeData,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(280.dp)
+                    .background(
+                        color = MaterialTheme.colorScheme.surfaceVariant,
+                        shape = MaterialTheme.shapes.medium
+                    )
+                    .padding(16.dp)
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            weeklyGraphData.forEachIndexed { index, item ->
                 Text(
-                    text = "${index + 1}. ${item.first} : ${item.second.toInt()} 볼륨",
+                    text = "${index + 1}. ${item.weekLabel} | 최고 중량 ${item.maxWeight}kg | 총 볼륨 ${item.volume.toInt()}",
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.padding(vertical = 4.dp)
                 )
@@ -91,16 +153,14 @@ fun GraphScreen(viewModel: WorkoutViewModel) {
 }
 
 @Composable
-
-fun VolumeLineChart (
+fun VolumeLineChart(
     data: List<Pair<String, Float>>,
     modifier: Modifier = Modifier
 ) {
     val primaryColor = MaterialTheme.colorScheme.primary
-    val textColor = MaterialTheme.colorScheme.onSurfaceVariant
     val gridColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
 
-    Canvas(modifier = Modifier) {
+    Canvas(modifier = modifier) {
         if (data.isEmpty()) return@Canvas
 
         val values = data.map { it.second }
@@ -138,7 +198,8 @@ fun VolumeLineChart (
                 leftPadding + (usableWidth / (data.size - 1)) * index
             }
 
-            val y = graphHeight - bottomPadding - (item.second / maxValue) * usableHeight
+            val y = graphHeight - bottomPadding -
+                    (item.second / maxValue) * usableHeight
 
             Offset(x, y)
         }
@@ -169,7 +230,3 @@ fun VolumeLineChart (
         }
     }
 }
-
-
-
-

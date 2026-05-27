@@ -32,6 +32,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.physicaltraining.ui.WorkoutViewModel
 import com.example.physicaltraining.ui.screen.CheckListScreen
+import com.example.physicaltraining.ui.screen.GraphScreen
 import com.example.physicaltraining.ui.screen.RestTimeBar
 import com.example.physicaltraining.ui.screen.RoutineScreen
 import com.example.physicaltraining.ui.screen.TimeoutDialog

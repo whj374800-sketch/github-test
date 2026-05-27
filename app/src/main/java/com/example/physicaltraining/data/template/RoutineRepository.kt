@@ -292,7 +292,7 @@ class RoutineRepository {
             "목요일" to strongLiftsRest,
             "금요일" to strongLiftsA2
         ),
-        "PPL 分割 루틴" to mapOf(
+        "PPL 분할 루틴" to mapOf(
             "월요일" to pplPush1,
             "화요일" to pplPull1,
             "수요일" to pplLegs,

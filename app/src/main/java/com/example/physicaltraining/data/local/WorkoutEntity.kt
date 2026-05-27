@@ -10,6 +10,8 @@ data class RoutineEntity(
     @PrimaryKey val id: String,
     val name: String,
     val date: Long = System.currentTimeMillis(),
+    val isCompleted: Boolean = false,
+    val nextRoutineGenerated: Boolean = false
 
 )
 
@@ -33,4 +35,20 @@ data class WorkoutSetEntity(
     val reps: Int,
     val isChecked: Boolean,
     val restTime: Int = 60
+)
+
+@Entity(tableName = "workout_history")
+data class WorkoutHistoryEntity(
+    @PrimaryKey(autoGenerate = true)
+    val historyId: Int = 0,
+
+    val routineId: String,
+    val routineName: String,
+    val exerciseName: String,
+
+    val weight: Float,
+    val reps: Int,
+    val isCompleted: Boolean,
+
+    val completedAt: Long = System.currentTimeMillis()
 )

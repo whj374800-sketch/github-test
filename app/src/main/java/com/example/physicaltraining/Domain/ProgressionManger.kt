@@ -109,7 +109,9 @@ object ProgressionManager {
     ): Float {
 
         val progressionType =
-            routineProgressionMap[routineName]
+            routineProgressionMap.entries
+                .firstOrNull() { routineName.startsWith(it.key)}
+                ?.value
                 ?: ProgressionType.LINEAR
 
         return when (progressionType) {

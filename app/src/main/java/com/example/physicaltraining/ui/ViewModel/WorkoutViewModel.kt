@@ -11,6 +11,7 @@ import com.example.physicaltraining.Domain.RoutineWeightCalculator
 import com.example.physicaltraining.data.WorkoutRepository
 import com.example.physicaltraining.data.local.RoutineEntity
 import com.example.physicaltraining.data.local.UserProfileEntity
+import com.example.physicaltraining.data.local.WorkoutHistoryEntity
 import com.example.physicaltraining.data.local.WorkoutSetEntity
 import com.example.physicaltraining.data.template.RoutineRepository
 import kotlinx.coroutines.Job
@@ -21,7 +22,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.UUID
-
 
 
 data class WorkoutSet(
@@ -40,9 +40,14 @@ data class DailyRoutine(
 
 class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() {
 
-    private var modelManager : WorkoutModelManager? = null
+    private val _workoutHistory =
+        MutableStateFlow<List<WorkoutHistoryEntity>>(emptyList())
 
-    private var timerJob : Job? = null
+    val workoutHistory = _workoutHistory.asStateFlow()
+
+    private var modelManager: WorkoutModelManager? = null
+
+    private var timerJob: Job? = null
 
     private val _restTimeLeft = MutableStateFlow(0)
     val restTimerLeft = _restTimeLeft.asStateFlow()
@@ -65,16 +70,17 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
     init {
         loadRoutinesFromDb()
         loadUserProfile()
+        loadWorkoutHistory()
     }
 
-    fun initAiModel(context : android.content.Context) {
+    fun initAiModel(context: android.content.Context) {
         if (modelManager == null) {
             modelManager = WorkoutModelManager(context)
         }
     }
 
-    fun getAiRecommendation(inputData : FloatArray) : FloatArray {
-        return modelManager?.predict(inputData) ?: floatArrayOf(0f,0f,0f,0f)
+    fun getAiRecommendation(inputData: FloatArray): FloatArray {
+        return modelManager?.predict(inputData) ?: floatArrayOf(0f, 0f, 0f, 0f)
     }
 
 
@@ -109,6 +115,7 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
             }
         }
     }
+
     fun addRoutine(name: String) {
         if (name.isBlank()) return
         val newRoutine = DailyRoutine(name = name)
@@ -123,7 +130,7 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
 
         _routines.update { currentList ->
             currentList.map { routine ->
-                if (routine.id == routineId ) {
+                if (routine.id == routineId) {
                     val newMap = routine.exercises.toMutableMap()
 
                     if (!newMap.containsKey(exerciseName)) {
@@ -136,16 +143,18 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
                         newMap[exerciseName] = listOf(initialSet)
 
                         viewModelScope.launch {
-                            repository.insertSets(listOf(
-                                WorkoutSetEntity(
-                                    routineId = routineId,
-                                    exerciseName = exerciseName,
-                                    weight = 0f,
-                                    reps = 0,
-                                    isChecked = false,
-                                    restTime = restTime
+                            repository.insertSets(
+                                listOf(
+                                    WorkoutSetEntity(
+                                        routineId = routineId,
+                                        exerciseName = exerciseName,
+                                        weight = 0f,
+                                        reps = 0,
+                                        isChecked = false,
+                                        restTime = restTime
+                                    )
                                 )
-                            ))
+                            )
                         }
 
                     }
@@ -193,8 +202,12 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
             }
         }
         toggleSEtEntity?.let { entity ->
-            viewModelScope.launch{
+            viewModelScope.launch {
                 repository.updateSet(entity)
+
+                if (entity.isChecked) {
+                    checkAndCreateNextWeekRoutine(routineId)
+                }
             }
         }
     }
@@ -213,16 +226,18 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
                     newMap[exercise] = currentSets
 
                     viewModelScope.launch {
-                        repository.insertSets(listOf(
-                            WorkoutSetEntity(
-                                routineId = routineId,
-                                exerciseName = exercise,
-                                weight = weight,
-                                reps = reps,
-                                isChecked = false,
-                                restTime = existingRestTime
+                        repository.insertSets(
+                            listOf(
+                                WorkoutSetEntity(
+                                    routineId = routineId,
+                                    exerciseName = exercise,
+                                    weight = weight,
+                                    reps = reps,
+                                    isChecked = false,
+                                    restTime = existingRestTime
+                                )
                             )
-                        ))
+                        )
                     }
                     routine.copy(exercises = newMap)
                 } else routine
@@ -231,7 +246,7 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
     }
 
     fun removeSet(routineId: String, exercise: String, setIndex: Int) {
-        var setIdtoDelete: Int? =null
+        var setIdtoDelete: Int? = null
 
 
         _routines.update { currentList ->
@@ -251,7 +266,7 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
             }
         }
 
-        setIdtoDelete?.let {setId ->
+        setIdtoDelete?.let { setId ->
             viewModelScope.launch {
                 repository.deleteSetById(setId)
             }
@@ -297,10 +312,10 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
         }
     }
 
-    fun deleteExercise(routineId: String,exerciseName: String) {
+    fun deleteExercise(routineId: String, exerciseName: String) {
         _routines.update { currentList ->
             currentList.map { routine ->
-                if ( routine.id == routineId) {
+                if (routine.id == routineId) {
                     val newExercise = routine.exercises.toMutableMap()
                     newExercise.remove(exerciseName)
                     routine.copy(exercises = newExercise)
@@ -326,8 +341,7 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
         }
     }
 
-    fun stopRestTimer()
-    {
+    fun stopRestTimer() {
         timerJob?.cancel()
         _isTimerRunning.value = false
         _restTimeLeft.value = 0
@@ -338,8 +352,11 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
     }
 
 
-    fun getRecommendedRoutine(context: Context, userInputs: FloatArray, blueprint : List<RoutineRepository.ExerciseDetail>) : List<CalculatedExercise>
-    {
+    fun getRecommendedRoutine(
+        context: Context,
+        userInputs: FloatArray,
+        blueprint: List<RoutineRepository.ExerciseDetail>
+    ): List<CalculatedExercise> {
         initModel(context)
         val calculator = RoutineWeightCalculator()
         val aiResult = modelManager!!.predict(userInputs)
@@ -349,7 +366,10 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
         result.forEach { exercise ->
             Log.d("AI_ROUTINE_TEST", "🏋️ 운동 종목: ${exercise.name}")
             exercise.calculatedSets.forEachIndexed { index, set ->
-                Log.d("AI_ROUTINE_TEST", "   └ [${index + 1}세트] 무게: ${set.weight}kg / 횟수: ${set.reps}회")
+                Log.d(
+                    "AI_ROUTINE_TEST",
+                    "   └ [${index + 1}세트] 무게: ${set.weight}kg / 횟수: ${set.reps}회"
+                )
             }
         }
 
@@ -363,7 +383,7 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
         onComplete: () -> Unit
     ) {
         initModel(context)
-        val aiResult = modelManager?.predict(userInputs) ?: floatArrayOf(0f,0f,0f,0f)
+        val aiResult = modelManager?.predict(userInputs) ?: floatArrayOf(0f, 0f, 0f, 0f)
 
         android.util.Log.d("AI_TEST", "👉 1. AI에게 보낸 입력값: ${userInputs.contentToString()}")
         android.util.Log.d("AI_TEST", "🚨 2. AI가 뱉어낸 진짜 결과값: ${aiResult.contentToString()}")
@@ -385,7 +405,8 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
                     RoutineEntity(id = newRoutineId, name = fullRoutineName)
                 )
 
-                val calculatedExercise = calculator.calculateRoutine(aiResult, exerciseBlueprintList)
+                val calculatedExercise =
+                    calculator.calculateRoutine(aiResult, exerciseBlueprintList)
 
                 val setEntitiesToInsert = mutableListOf<WorkoutSetEntity>()
 
@@ -446,6 +467,7 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
             _userProfile.value = profile
         }
     }
+
     private fun loadUserProfile() {
         viewModelScope.launch {
             _userProfile.value = repository.getUserProfile()
@@ -461,7 +483,7 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
         routine.exercises.forEach { (exerciseName, sets) ->
 
             val allSetsSuccess =
-                sets.all { it.isChecked}
+                sets.all { it.isChecked }
 
             val lastSet =
                 sets.lastOrNull()
@@ -483,5 +505,100 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
             )
         }
     }
+
+    private suspend fun checkAndCreateNextWeekRoutine(routineId: String) {
+        val routine = _routines.value.find { it.id == routineId } ?: return
+
+        val isAllCompleted =
+            routine.exercises.values
+                .flatten()
+                .all { it.isChecked }
+
+        val historyEntities = routine.exercises.flatMap { (exerciseName, sets) ->
+            sets.map { set ->
+                WorkoutHistoryEntity(
+                    routineId = routine.id,
+                    routineName = routine.name,
+                    exerciseName = exerciseName,
+                    weight = set.weight,
+                    reps = set.reps,
+                    isCompleted = set.isChecked
+                )
+            }
+        }
+
+        repository.insertWorkoutHistory(historyEntities)
+
+        if (!isAllCompleted) return
+
+        val nextRoutineName = "${routine.name} - 다음주"
+
+        val alreadyExists =
+            _routines.value.any { it.name == nextRoutineName }
+
+        if (alreadyExists) return
+
+        val nextRoutineId = UUID.randomUUID().toString()
+
+        val nextSetEntities = mutableListOf<WorkoutSetEntity>()
+
+        routine.exercises.forEach { (exerciseName, sets) ->
+            val lastSet = sets.lastOrNull() ?: return@forEach
+
+            val nextWeight =
+                ProgressionManager.calculateNextWeight(
+                    routineName = routine.name,
+                    exerciseName = exerciseName,
+                    currentWeight = lastSet.weight,
+                    allSetsSuccess = true,
+                    currentReps = lastSet.reps,
+                    targetReps = lastSet.reps
+                )
+
+            sets.forEach { set ->
+                nextSetEntities.add(
+                    WorkoutSetEntity(
+                        routineId = nextRoutineId,
+                        exerciseName = exerciseName,
+                        weight = nextWeight,
+                        reps = set.reps,
+                        isChecked = false,
+                        restTime = set.restTime
+                    )
+                )
+            }
+        }
+
+        repository.insertRoutine(
+            RoutineEntity(
+                id = nextRoutineId,
+                name = nextRoutineName
+            )
+        )
+
+        if (nextSetEntities.isNotEmpty()) {
+            repository.insertSets(nextSetEntities)
+        }
+        repository.updateRoutine(
+            RoutineEntity(
+                id = routine.id,
+                name = routine.name,
+                isCompleted = true,
+                nextRoutineGenerated = true
+            )
+        )
+
+    }
+
+    private fun loadWorkoutHistory() {
+        viewModelScope.launch {
+            repository.getAllWorkoutHistory().collect {
+                _workoutHistory.value = it
+            }
+        }
+    }
+
+
+
 
 }

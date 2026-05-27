@@ -8,10 +8,12 @@ import androidx.room.RoomDatabase
 @Database(entities = [
         RoutineEntity::class,
         WorkoutSetEntity::class,
-        UserProfileEntity::class
+        UserProfileEntity::class,
+        WorkoutHistoryEntity::class
+
     ],
 
-    version = 5,
+    version = 7,
 
     exportSchema = false)
 abstract class AppDatabase : RoomDatabase()

@@ -39,4 +39,22 @@ interface WorkoutDao {
 
     @Query("SELECT * FROM user_profile WHERE id = 0")
     suspend fun getUserProfile(): UserProfileEntity?
+
+    @Update
+    suspend fun updateRoutine(routine: RoutineEntity)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertWorkoutHistory(history: List<WorkoutHistoryEntity>)
+
+    @Query("SELECT * FROM workout_history ORDER BY completedAt ASC")
+    fun getAllWorkoutHistory(): Flow<List<WorkoutHistoryEntity>>
+
+    @Query("""
+    SELECT * FROM workout_history
+    WHERE exerciseName = :exerciseName
+    ORDER BY completedAt ASC
+""")
+    fun getHistoryByExercise(exerciseName: String): Flow<List<WorkoutHistoryEntity>>
+
+
 }

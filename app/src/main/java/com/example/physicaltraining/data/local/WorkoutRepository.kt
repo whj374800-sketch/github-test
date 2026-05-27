@@ -3,6 +3,7 @@ package com.example.physicaltraining.data
 import com.example.physicaltraining.data.local.RoutineEntity
 import com.example.physicaltraining.data.local.UserProfileEntity
 import com.example.physicaltraining.data.local.WorkoutDao
+import com.example.physicaltraining.data.local.WorkoutHistoryEntity
 import com.example.physicaltraining.data.local.WorkoutSetEntity
 import kotlinx.coroutines.flow.Flow
 
@@ -43,6 +44,22 @@ class WorkoutRepository(private val workoutDao: WorkoutDao) {
 
     suspend fun getUserProfile(): UserProfileEntity? {
         return workoutDao.getUserProfile()
+    }
+
+    suspend fun updateRoutine(routine: RoutineEntity) {
+        workoutDao.updateRoutine(routine)
+    }
+
+    fun getAllWorkoutHistory(): Flow<List<WorkoutHistoryEntity>> {
+        return workoutDao.getAllWorkoutHistory()
+    }
+
+    fun getHistoryByExercise(exerciseName: String): Flow<List<WorkoutHistoryEntity>> {
+        return workoutDao.getHistoryByExercise(exerciseName)
+    }
+
+    suspend fun insertWorkoutHistory(history: List<WorkoutHistoryEntity>) {
+        workoutDao.insertWorkoutHistory(history)
     }
 
 }
