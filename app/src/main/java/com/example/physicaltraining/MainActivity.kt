@@ -12,7 +12,6 @@ import com.example.physicaltraining.data.remote.FirebaseWorkoutRepository
 import com.example.physicaltraining.ui.WorkoutViewModel
 import com.example.physicaltraining.ui.navigation.MainApp
 
-
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

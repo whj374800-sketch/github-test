@@ -126,7 +126,7 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
     }
 
     fun addExerciseToRoutine(routineId: String, exerciseName: String, restTime: Int = 60) {
-        if (exerciseName.isNotBlank()) return
+        if (exerciseName.isBlank()) return
 
         _routines.update { currentList ->
             currentList.map { routine ->
@@ -610,6 +610,9 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
 
     fun backupWorkoutHistoryToFirebase(userId: String = "test_user") {
         viewModelScope.launch {
+
+            Log.d("FIREBASE_TEST", "업로드 개수: ${_workoutHistory.value.size}")
+
             try {
                 repository.backupWorkoutHistoryToFirebase(
                     userId = userId,
@@ -619,7 +622,9 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
                 Log.d("FIREBASE_BACKUP", "운동 히스토리 백업 성공")
             } catch (e: Exception) {
                 Log.e("FIREBASE_BACKUP", "운동 히스토리 백업 실패", e)
+
             }
+
         }
     }
 

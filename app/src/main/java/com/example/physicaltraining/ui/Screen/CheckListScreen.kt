@@ -93,7 +93,7 @@ fun CheckListScreen(routineId: String, viewModel: WorkoutViewModel, navControlle
                             Text(text = exercise, style = MaterialTheme.typography.titleLarge, modifier = Modifier.weight(1f))
                             IconButton(onClick = {
                                 val currentRestTime = sets.firstOrNull()?.restTime ?: 60
-                                navController.navigate(AppRoute.Timer.createRoute(exercise,currentRestTime))
+                                navController.navigate(AppRoute.Timer.createRoute(routineId = routineId, exerciseName = exercise, initialTime = currentRestTime ))
                             }) {
                                 Icon(Icons.Default.PlayArrow, "타이머 시작", tint = MaterialTheme.colorScheme.primary)
                             }
@@ -110,7 +110,11 @@ fun CheckListScreen(routineId: String, viewModel: WorkoutViewModel, navControlle
                                 onCheckedChange = { isChecked ->
                                     viewModel.toggleSet(currentRoutine.id, exercise, index)
                                     if (isChecked) {
-                                        navController.navigate(AppRoute.Timer.createRoute(exercise, setInfo.restTime))
+                                        val restTime = setInfo.restTime
+                                        navController.navigate(AppRoute.Timer.createRoute(
+                                            routineId = routineId,
+                                            exerciseName = exercise,
+                                            initialTime = restTime))
                                     }
                                 }
                             )
@@ -159,7 +163,11 @@ fun CheckListScreen(routineId: String, viewModel: WorkoutViewModel, navControlle
             confirmButton = {
                 TextButton(onClick = {
                     val restTimeInt = inputRestTime.toIntOrNull() ?: 60
-                    viewModel.addExerciseToRoutine(currentRoutine.id, inputExerciseName)
+
+                    viewModel.addExerciseToRoutine(
+                        routineId = currentRoutine.id,
+                        exerciseName =  inputExerciseName,
+                        restTime = restTimeInt)
 
                     inputExerciseName = ""
                     inputRestTime = "60"
