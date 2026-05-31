@@ -10,7 +10,7 @@ import com.example.physicaltraining.data.WorkoutRepository
 import com.example.physicaltraining.data.local.AppDatabase
 import com.example.physicaltraining.data.remote.FirebaseWorkoutRepository
 import com.example.physicaltraining.ui.WorkoutViewModel
-import com.example.physicaltraining.ui.navigation.MainApp
+import com.example.physicaltraining.ui.auth.PhysicalTrainingRoot
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -44,7 +44,9 @@ class MainActivity : ComponentActivity() {
         val viewModel = ViewModelProvider(this, viewModelFactory)[WorkoutViewModel::class.java]
 
         setContent {
-            MainApp(viewModel = viewModel)
+            PhysicalTrainingRoot(
+                workoutViewModel = viewModel
+            )
         }
     }
 }

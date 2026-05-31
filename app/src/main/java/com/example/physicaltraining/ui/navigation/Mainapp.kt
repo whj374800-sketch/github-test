@@ -40,7 +40,10 @@ import com.example.physicaltraining.ui.screen.WorkoutInputScreen
 
 
 @Composable
-fun MainApp(viewModel: WorkoutViewModel) {
+fun MainApp(
+    viewModel: WorkoutViewModel,
+    onLogout : () -> Unit = {}
+) {
     val navController = rememberNavController()
 
 
@@ -65,7 +68,8 @@ fun MainApp(viewModel: WorkoutViewModel) {
             composable(AppRoute.Home.route) {
                 HomeScreen(
                     navController = navController,
-                    viewModel = viewModel
+                    viewModel = viewModel,
+                    onLogout = onLogout
                 )
             }
 
@@ -146,7 +150,9 @@ fun MainApp(viewModel: WorkoutViewModel) {
 @Composable
 fun HomeScreen(
     navController: NavController,
-    viewModel: WorkoutViewModel
+    viewModel : WorkoutViewModel,
+    onLogout: () -> Unit = {}
+
 ) {
     Column(
         modifier = Modifier.fillMaxSize().padding(16.dp),
@@ -161,6 +167,10 @@ fun HomeScreen(
         HomeButton("성장 그래프") { navController.navigate(AppRoute.Graph.route) }
         HomeButton("AI 무게 설정") { navController.navigate(AppRoute.AiSetup.route) }
         HomeButton("Firebase 백업") { viewModel.backupWorkoutHistoryToFirebase()}
+        HomeButton("Firebase 복원") {
+            viewModel.restoreWorkoutHistoryFromFirebase()
+        }
+        HomeButton("로그아웃") { onLogout }
     }
 }
 

@@ -76,4 +76,32 @@ class WorkoutRepository(
             historyList = historyList
         )
     }
+    suspend fun restoreWorkoutHistoryFromFirebase(userId: String) {
+        android.util.Log.d("FIREBASE_RESTORE", "Repository 복원 요청 시작")
+
+        val historyList =
+            firebaseWorkoutRepository.downloadWorkoutHistory(userId)
+
+        android.util.Log.d(
+            "FIREBASE_RESTORE",
+            "Firebase에서 가져온 개수 = ${historyList.size}"
+        )
+
+        if (historyList.isNotEmpty()) {
+            workoutDao.insertWorkoutHistory(historyList)
+
+            android.util.Log.d(
+                "FIREBASE_RESTORE",
+                "Room DB에 히스토리 저장 완료"
+            )
+        } else {
+            android.util.Log.d(
+                "FIREBASE_RESTORE",
+                "가져온 히스토리가 비어 있음"
+            )
+        }
+    }
+
+
+
 }

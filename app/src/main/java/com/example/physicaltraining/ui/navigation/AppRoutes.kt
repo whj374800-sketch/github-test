@@ -14,11 +14,14 @@ sealed class AppRoute(val route: String) {
             routineId: String,
             exerciseName: String,
             initialTime: Int
-        ) = "timer/$routineId/$exerciseName/$initialTime"
+        ): String {
+            return "timer/$routineId/$exerciseName/$initialTime"
+        }
     }
 
     object FreeTimer : AppRoute("free_timer")
 
     object Graph : AppRoute("graph")
+
     object AiSetup : AppRoute("ai_setup")
 }

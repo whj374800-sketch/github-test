@@ -341,6 +341,7 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
         }
     }
 
+
     fun stopRestTimer() {
         timerJob?.cancel()
         _isTimerRunning.value = false
@@ -625,6 +626,21 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
 
             }
 
+        }
+    }
+
+    fun restoreWorkoutHistoryFromFirebase(userId: String = "test_user") {
+        viewModelScope.launch {
+            try {
+                Log.d("FIREBASE_RESTORE", "복원 시작 userId = $userId")
+
+                repository.restoreWorkoutHistoryFromFirebase(userId)
+
+                Log.d("FIREBASE_RESTORE", "운동 히스토리 복원 성공")
+
+            } catch (e: Exception) {
+                Log.e("FIREBASE_RESTORE", "운동 히스토리 복원 실패", e)
+            }
         }
     }
 
