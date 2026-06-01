@@ -1,0 +1,218 @@
+{
+  "version": 1,
+  "source": "RoutineRepository.kt",
+  "assetBasePath": "routine_images",
+  "exercises": [
+    {
+      "name": "덤벨 숄더 프레스",
+      "matched": true,
+      "imageAsset": "routine_images/dumbbell_shoulder_press.png",
+      "note": "시티드 덤벨 숄더 프레스 사진 매칭"
+    },
+    {
+      "name": "덤벨 플라이",
+      "matched": true,
+      "imageAsset": "routine_images/dumbbell_fly.png",
+      "note": "덤벨 플라이 사진 매칭"
+    },
+    {
+      "name": "데드리프트",
+      "matched": true,
+      "imageAsset": "routine_images/deadlift.png",
+      "note": "일반 데드리프트 사진 매칭"
+    },
+    {
+      "name": "데드리프트 (BBB)",
+      "matched": true,
+      "imageAsset": "routine_images/deadlift.png",
+      "note": "데드리프트 변형명, 동일 사진 재사용"
+    },
+    {
+      "name": "딥스",
+      "matched": true,
+      "imageAsset": "routine_images/dips.png",
+      "note": "딥스 사진 매칭"
+    },
+    {
+      "name": "라잉 트라이셉스 익스텐션",
+      "matched": true,
+      "imageAsset": "routine_images/lying_triceps_extension.png",
+      "note": "라잉 트라이셉스 익스텐션 사진 매칭"
+    },
+    {
+      "name": "레그 익스텐션",
+      "matched": true,
+      "imageAsset": "routine_images/leg_extension.png",
+      "note": "레그 익스텐션 머신 사진 매칭"
+    },
+    {
+      "name": "레그 컬",
+      "matched": true,
+      "imageAsset": "routine_images/leg_curl.png",
+      "note": "라잉 레그 컬 머신 사진 매칭"
+    },
+    {
+      "name": "레그 프레스",
+      "matched": true,
+      "imageAsset": "routine_images/leg_press.png",
+      "note": "레그 프레스 사진 매칭"
+    },
+    {
+      "name": "렛풀다운",
+      "matched": true,
+      "imageAsset": "routine_images/lat_pulldown.png",
+      "note": "렛풀다운 사진 매칭"
+    },
+    {
+      "name": "바벨 데드리프트",
+      "matched": true,
+      "imageAsset": "routine_images/deadlift.png",
+      "note": "일반 데드리프트 사진 매칭"
+    },
+    {
+      "name": "바벨 로우",
+      "matched": true,
+      "imageAsset": "routine_images/barbell_row.png",
+      "note": "바벨 로우 사진 매칭"
+    },
+    {
+      "name": "바벨 루마니안 데드리프트",
+      "matched": true,
+      "imageAsset": "routine_images/barbell_romanian_deadlift.png",
+      "note": "루마니안 데드리프트 계열 사진 매칭"
+    },
+    {
+      "name": "바벨 벤치프레스",
+      "matched": true,
+      "imageAsset": "routine_images/bench_press.png",
+      "note": "벤치프레스 사진 매칭"
+    },
+    {
+      "name": "바벨 스쿼트",
+      "matched": true,
+      "imageAsset": "routine_images/squat.png",
+      "note": "바벨 백 스쿼트 사진 매칭"
+    },
+    {
+      "name": "바벨 컬",
+      "matched": true,
+      "imageAsset": "routine_images/barbell_curl.png",
+      "note": "바벨 컬 사진 매칭"
+    },
+    {
+      "name": "벤치프레스",
+      "matched": true,
+      "imageAsset": "routine_images/bench_press.png",
+      "note": "벤치프레스 사진 매칭"
+    },
+    {
+      "name": "벤치프레스 (BBB)",
+      "matched": true,
+      "imageAsset": "routine_images/bench_press.png",
+      "note": "벤치프레스 변형명, 동일 사진 재사용"
+    },
+    {
+      "name": "사이드 레터럴 레이즈",
+      "matched": true,
+      "imageAsset": "routine_images/side_lateral_raise.png",
+      "note": "사이드 레터럴 레이즈 사진 매칭"
+    },
+    {
+      "name": "스모 데드리프트",
+      "matched": true,
+      "imageAsset": "routine_images/sumo_deadlift.png",
+      "note": "스모 데드리프트 사진 매칭"
+    },
+    {
+      "name": "스쿼트",
+      "matched": true,
+      "imageAsset": "routine_images/squat.png",
+      "note": "바벨 백 스쿼트 사진 매칭"
+    },
+    {
+      "name": "스쿼트 (BBB)",
+      "matched": true,
+      "imageAsset": "routine_images/squat.png",
+      "note": "스쿼트 변형명, 동일 사진 재사용"
+    },
+    {
+      "name": "스티프 레그 데드리프트",
+      "matched": true,
+      "imageAsset": "routine_images/stiff_leg_deadlift.png",
+      "note": "스티프 레그 데드리프트 사진 매칭"
+    },
+    {
+      "name": "시티드 케이블 로우",
+      "matched": true,
+      "imageAsset": "routine_images/seated_cable_row.png",
+      "note": "시티드 케이블 로우 사진 매칭"
+    },
+    {
+      "name": "오버헤드 프레스",
+      "matched": true,
+      "imageAsset": "routine_images/overhead_press.png",
+      "note": "스탠딩 바벨 오버헤드 프레스 사진 매칭"
+    },
+    {
+      "name": "오버헤드 프레스 (BBB)",
+      "matched": true,
+      "imageAsset": "routine_images/overhead_press.png",
+      "note": "오버헤드 프레스 변형명, 동일 사진 재사용"
+    },
+    {
+      "name": "인클라인 덤벨 프레스",
+      "matched": true,
+      "imageAsset": "routine_images/incline_dumbbell_press.png",
+      "note": "인클라인 덤벨 프레스 사진 매칭"
+    },
+    {
+      "name": "인클라인 벤치프레스",
+      "matched": true,
+      "imageAsset": "routine_images/incline_bench_press.png",
+      "note": "인클라인 바벨 벤치프레스 사진 매칭"
+    },
+    {
+      "name": "종아리 운동",
+      "matched": true,
+      "imageAsset": "routine_images/calf_raise.png",
+      "note": "카프 레이즈 사진을 종아리 운동 이미지로 매칭"
+    },
+    {
+      "name": "카프 레이즈",
+      "matched": true,
+      "imageAsset": "routine_images/calf_raise.png",
+      "note": "카프 레이즈 사진 매칭"
+    },
+    {
+      "name": "케틀벨 스윙 (맨몸 대체)",
+      "matched": true,
+      "imageAsset": "routine_images/kettlebell_swing.png",
+      "note": "케틀벨 스윙 사진 매칭"
+    },
+    {
+      "name": "클로즈 그립 벤치프레스",
+      "matched": true,
+      "imageAsset": "routine_images/close_grip_bench_press.png",
+      "note": "클로즈 그립 벤치프레스 사진 매칭"
+    },
+    {
+      "name": "풀업",
+      "matched": true,
+      "imageAsset": "routine_images/pull_up.png",
+      "note": "풀업 사진 매칭"
+    },
+    {
+      "name": "프론트 스쿼트",
+      "matched": true,
+      "imageAsset": "routine_images/front_squat.png",
+      "note": "프론트 스쿼트 사진 매칭"
+    }
+  ],
+  "unmatchedExercises": [],
+  "unusedImages": [
+    {
+      "imageAsset": "routine_images/seated_shoulder_press.png",
+      "reason": "루틴에는 시티드 바벨 숄더 프레스 운동명이 없어 정확 매칭 제외"
+    }
+  ]
+}
