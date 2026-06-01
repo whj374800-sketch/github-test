@@ -3,6 +3,7 @@ package com.example.physicaltraining.ui.screen
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,16 +13,19 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -36,15 +40,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.physicaltraining.ui.WorkoutViewModel
-
-data class ExerciseInputData(
-    val name: String = "",
-    val restTime : String = "60"
-)
 
 @Composable
 fun RoutineScreen(viewModel: WorkoutViewModel, navController: NavController) {
@@ -64,13 +62,29 @@ fun RoutineScreen(viewModel: WorkoutViewModel, navController: NavController) {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(16.dp)
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
-            Text("나의 운동 루틴 목록", style = MaterialTheme.typography.headlineMedium)
-            Spacer(modifier = Modifier.height(16.dp))
+            Column {
+                Text(
+                    "나의 루틴",
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    "${routines.size}개 루틴이 준비되어 있습니다.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
 
             LazyColumn(modifier = Modifier.fillMaxSize()) {
                 items(routines) { routine ->
+                    val exerciseCount = routine.exercises.size
+                    val setCount = routine.exercises.values.sumOf { it.size }
+                    val completedCount = routine.exercises.values.flatten().count { it.isChecked }
+                    val progress = if (setCount == 0) 0f else completedCount / setCount.toFloat()
+
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -78,26 +92,54 @@ fun RoutineScreen(viewModel: WorkoutViewModel, navController: NavController) {
                             .clickable {
                                 navController.navigate("checklist/${routine.id}")
                             },
-                        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                        shape = RoundedCornerShape(8.dp),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
                     ) {
 
                         Box(modifier = Modifier.fillMaxWidth()) {
 
-                            Column(modifier = Modifier.padding(16.dp).padding(end = 48.dp)) {
+                            Column(
+                                modifier = Modifier
+                                    .padding(16.dp)
+                                    .padding(end = 42.dp),
+                                verticalArrangement = Arrangement.spacedBy(10.dp)
+                            ) {
                                 Text(
                                     text = routine.name,
                                     style = MaterialTheme.typography.titleLarge,
                                     fontWeight = FontWeight.Bold
                                 )
-                                Spacer(modifier = Modifier.height(4.dp))
-                                Text(
-                                    text = if (routine.exercises.isNotEmpty()) {
-                                        "포함된 목록 : ${routine.exercises.keys.joinToString(", ")}"
-                                    } else {
-                                        "등록된 운동이 없습니다."
-                                    },
-                                    style = MaterialTheme.typography.bodyMedium
+
+                                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                    RoutineChip("운동 ${exerciseCount}개")
+                                    RoutineChip("세트 ${setCount}개")
+                                    RoutineChip("완료 ${completedCount}개")
+                                }
+
+                                LinearProgressIndicator(
+                                    progress = { progress },
+                                    modifier = Modifier.fillMaxWidth()
                                 )
+
+                                Text(
+                                    text = routine.exercises.keys.take(4).joinToString(" · ")
+                                        .ifBlank { "등록된 운동이 없습니다." },
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+
+                                Button(
+                                    onClick = {
+                                        navController.navigate("checklist/${routine.id}")
+                                    },
+                                    modifier = Modifier.fillMaxWidth().height(44.dp),
+                                    shape = RoundedCornerShape(8.dp)
+                                ) {
+                                    Icon(Icons.Default.PlayArrow, contentDescription = null)
+                                    Spacer(modifier = Modifier.width(6.dp))
+                                    Text("루틴 시작")
+                                }
                             }
 
                             IconButton(
@@ -121,8 +163,8 @@ fun RoutineScreen(viewModel: WorkoutViewModel, navController: NavController) {
     if (showAddRoutineDialog) {
         AddRoutineDialog(
             onDismiss = { showAddRoutineDialog = false },
-            onConfirm = { routineName, exerciseDataList ->
-                viewModel.addRoutineWithExercises(name = routineName,  exerciseDataList)
+            onConfirm = { routineName ->
+                viewModel.addRoutineWithExercises(name = routineName, emptyList())
                 showAddRoutineDialog = false
             }
         )
@@ -130,87 +172,60 @@ fun RoutineScreen(viewModel: WorkoutViewModel, navController: NavController) {
 }
 
 @Composable
+fun RoutineChip(text: String) {
+    Card(
+        shape = RoundedCornerShape(8.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+    ) {
+        Text(
+            text = text,
+            style = MaterialTheme.typography.labelMedium,
+            modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)
+        )
+    }
+}
+
+@Composable
 fun AddRoutineDialog(
     onDismiss : () -> Unit,
-    onConfirm : (String, List<Pair<String,Int>>) -> Unit) {
+    onConfirm : (String) -> Unit) {
 
     var routineName by rememberSaveable { mutableStateOf("") }
-    var exercises by rememberSaveable { mutableStateOf(listOf(ExerciseInputData())) }
-
-
 
     AlertDialog (
         onDismissRequest = onDismiss,
-        title = { Text("새로운 루틴 만들기")},
+        title = { Text("새 루틴 만들기")},
         text = {
             Column(modifier = Modifier.fillMaxWidth()) {
                 OutlinedTextField(
                     value = routineName,
                     onValueChange = { routineName = it },
-                    label = { Text("루틴 이름 (예 가슴/삼두)") },
+                    label = { Text("루틴 이름") },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true
                 )
-
-                Spacer(modifier = Modifier.height(16.dp))
-                Text("운동 추가 (이름 및 휴식시간)", style = MaterialTheme.typography.titleSmall)
-
-                exercises.forEachIndexed { index, exercise ->
-                    Row(
-                        modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-
-                        OutlinedTextField(
-                            value = exercise.name,
-                            onValueChange = { newValue ->
-                                val newList = exercises.toMutableList()
-                                newList[index] = exercise.copy(name = newValue)
-                                exercises = newList
-                            },
-                            label = { Text("운동 ${index + 1} ") },
-                            modifier = Modifier.weight(1f),
-                            singleLine = true
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-
-                        OutlinedTextField(
-                            value = exercise.restTime,
-                            onValueChange = { newValue ->
-                                val newList = exercises.toMutableList()
-                                newList[index] = exercise.copy(restTime = newValue)
-                                exercises = newList
-                            },
-                            label = { Text("휴식(초)") },
-                            modifier = Modifier.width(80.dp),
-                            singleLine = true,
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-
-                        )
-                    }
-                }
-                TextButton(
-                    onClick = { exercises = exercises + ExerciseInputData() },
-                    modifier = Modifier.padding(top = 8.dp)
-                ) {
-                    Text("+ 운동 칸 추가하기")
-                }
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "운동 종목은 생성된 루틴 안에서 이미지와 설명을 보며 추가할 수 있습니다.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
         },
             confirmButton = {
-                TextButton(onClick = {
-
-                    val exerciseDataList = exercises.map {
-                        Pair(it.name, it.restTime.toIntOrNull() ?: 60)
+                TextButton(
+                    onClick = {
+                        if (routineName.isNotBlank()) {
+                            onConfirm(routineName.trim())
+                        }
                     }
-                    onConfirm(routineName, exerciseDataList)
-                }) { Text("만들기") }
+                ) {
+                    Text("만들기")
+                }
             },
             dismissButton = {
                 TextButton(onClick = onDismiss) { Text("취소") }
             }
             )
         }
-
-
 

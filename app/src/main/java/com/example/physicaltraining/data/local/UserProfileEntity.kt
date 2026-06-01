@@ -9,9 +9,15 @@ data class UserProfileEntity(
 
     val id : Int = 0,
 
+    val name : String,
+
     val age : Int,
 
     val weight : Float,
 
-    val gender : String
+    val gender : String,
+
+    val experience : String,
+
+    val goal : String
 )

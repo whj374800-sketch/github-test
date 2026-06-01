@@ -4,6 +4,8 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 
 @Database(entities = [
         RoutineEntity::class,
@@ -13,7 +15,7 @@ import androidx.room.RoomDatabase
 
     ],
 
-    version = 7,
+    version = 8,
 
     exportSchema = false)
 abstract class AppDatabase : RoomDatabase()
@@ -25,6 +27,14 @@ abstract class AppDatabase : RoomDatabase()
         @Volatile
         private var INSTANCE: AppDatabase? = null
 
+        private val MIGRATION_7_8 = object : Migration(7, 8) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE user_profile ADD COLUMN name TEXT NOT NULL DEFAULT ''")
+                db.execSQL("ALTER TABLE user_profile ADD COLUMN experience TEXT NOT NULL DEFAULT '초보자'")
+                db.execSQL("ALTER TABLE user_profile ADD COLUMN goal TEXT NOT NULL DEFAULT '근비대'")
+            }
+        }
+
         fun getDatabase(context: Context): AppDatabase
         {
             return INSTANCE ?: synchronized(this)
@@ -33,7 +43,9 @@ abstract class AppDatabase : RoomDatabase()
                     context.applicationContext,
                     AppDatabase::class.java,
                     "workout_database"
-                ).build()
+                )
+                    .addMigrations(MIGRATION_7_8)
+                    .build()
                 INSTANCE = instance
                 instance
             }

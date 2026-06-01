@@ -11,9 +11,23 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -23,6 +37,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavType
@@ -50,6 +66,8 @@ fun MainApp(
     val timeLeft by viewModel.restTimerLeft.collectAsState()
     val isTimerRunning by viewModel.isTimerRunning.collectAsState()
     val showTimeoutDialog by viewModel.showTimeoutDialog.collectAsState()
+    val userProfile by viewModel.userProfile.collectAsState()
+    val weeklyProgressionRequest by viewModel.weeklyProgressionRequest.collectAsState()
 
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -116,7 +134,7 @@ fun MainApp(
             composable(AppRoute.AiSetup.route) {
                 WorkoutInputScreen(
                     viewModel = viewModel,
-                    userName = "홍길동",
+                    userName = userProfile?.name ?: "사용자",
                     onCalculationComplete = {
 
                         navController.navigate(AppRoute.RoutineList.route) {
@@ -143,6 +161,30 @@ fun MainApp(
                 onDismiss = { viewModel.dismissTimeoutDialog() }
             )
         }
+
+        weeklyProgressionRequest?.let { request ->
+            AlertDialog(
+                onDismissRequest = { viewModel.cancelWeeklyProgression() },
+                title = { Text("주간 루틴 완료") },
+                text = {
+                    Text(
+                        "${request.programName}의 이번 주 루틴 ${request.routineCount}개, " +
+                                "총 ${request.setCount}세트를 모두 완료했습니다.\n\n" +
+                                "다음 주 운동을 위해 기존 루틴의 무게를 증량하고 완료 체크를 초기화해도 괜찮을까요?"
+                    )
+                },
+                confirmButton = {
+                    TextButton(onClick = { viewModel.confirmWeeklyProgression() }) {
+                        Text("증량하기")
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { viewModel.cancelWeeklyProgression() }) {
+                        Text("나중에")
+                    }
+                }
+            )
+        }
     }
 }
 
@@ -154,32 +196,145 @@ fun HomeScreen(
     onLogout: () -> Unit = {}
 
 ) {
-    Column(
-        modifier = Modifier.fillMaxSize().padding(16.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text("피지컬 트레이닝", style = MaterialTheme.typography.headlineLarge)
-        Spacer(modifier = Modifier.height(32.dp))
+    val routines by viewModel.routines.collectAsState()
+    val history by viewModel.workoutHistory.collectAsState()
+    val profile by viewModel.userProfile.collectAsState()
 
-        HomeButton("운동 루틴 목록") { navController.navigate(AppRoute.RoutineList.route) }
-        HomeButton("휴식 타이머") { navController.navigate(AppRoute.FreeTimer.route) }
-        HomeButton("성장 그래프") { navController.navigate(AppRoute.Graph.route) }
-        HomeButton("AI 무게 설정") { navController.navigate(AppRoute.AiSetup.route) }
-        HomeButton("Firebase 백업") { viewModel.backupWorkoutHistoryToFirebase()}
-        HomeButton("Firebase 복원") {
-            viewModel.restoreWorkoutHistoryFromFirebase()
+    val nextRoutine = routines.firstOrNull { routine ->
+        routine.exercises.values.flatten().any { !it.isChecked }
+    } ?: routines.firstOrNull()
+    val totalSets = routines.sumOf { routine -> routine.exercises.values.sumOf { it.size } }
+    val completedSets = routines.sumOf { routine -> routine.exercises.values.flatten().count { it.isChecked } }
+    val progress = if (totalSets == 0) 0f else completedSets / totalSets.toFloat()
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        Column {
+            Text(
+                text = "${profile?.name?.takeIf { it.isNotBlank() } ?: "사용자"} 님",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Text(
+                text = "오늘의 트레이닝",
+                style = MaterialTheme.typography.headlineLarge,
+                fontWeight = FontWeight.Bold
+            )
         }
-        HomeButton("로그아웃") { onLogout }
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(8.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
+        ) {
+            Column(
+                modifier = Modifier.padding(18.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Text(
+                    text = nextRoutine?.name ?: "아직 등록된 루틴이 없습니다",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = if (nextRoutine == null) {
+                        "AI 무게 설정에서 첫 루틴을 생성해보세요."
+                    } else {
+                        "${completedSets}/${totalSets} 세트 완료"
+                    },
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.72f)
+                )
+                LinearProgressIndicator(
+                    progress = { progress },
+                    modifier = Modifier.fillMaxWidth(),
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Button(
+                    onClick = {
+                        nextRoutine?.let {
+                            navController.navigate(AppRoute.CheckList.createRoute(it.id))
+                        } ?: navController.navigate(AppRoute.AiSetup.route)
+                    },
+                    modifier = Modifier.fillMaxWidth().height(48.dp),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Icon(Icons.Default.PlayArrow, contentDescription = null)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(if (nextRoutine == null) "루틴 만들기" else "운동 시작")
+                }
+            }
+        }
+
+        Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            HomeMetric("루틴", routines.size.toString(), Modifier.weight(1f))
+            HomeMetric("운동", routines.sumOf { it.exercises.size }.toString(), Modifier.weight(1f))
+            HomeMetric("기록", history.size.toString(), Modifier.weight(1f))
+        }
+
+        Text("빠른 메뉴", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+
+        HomeActionButton(Icons.Default.PlayArrow, "운동 루틴 목록") {
+            navController.navigate(AppRoute.RoutineList.route)
+        }
+        HomeActionButton(Icons.Default.PlayArrow, "휴식 타이머") {
+            navController.navigate(AppRoute.FreeTimer.route)
+        }
+        HomeActionButton(Icons.Default.PlayArrow, "성장 그래프") {
+            navController.navigate(AppRoute.Graph.route)
+        }
+        HomeActionButton(Icons.Default.Add, "AI 맞춤 루틴 생성") {
+            navController.navigate(AppRoute.AiSetup.route)
+        }
+
+        OutlinedButton(
+            onClick = onLogout,
+            modifier = Modifier.fillMaxWidth().height(52.dp),
+            shape = RoundedCornerShape(8.dp)
+        ) {
+            Icon(Icons.Default.Close, contentDescription = null)
+            Spacer(modifier = Modifier.width(8.dp))
+            Text("로그아웃")
+        }
     }
 }
 
 @Composable
-fun HomeButton(text: String, onClick: () -> Unit) {
-    Button(
-        onClick = onClick,
-        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp).height(56.dp)
+fun HomeMetric(label: String, value: String, modifier: Modifier = Modifier) {
+    Card(
+        modifier = modifier,
+        shape = RoundedCornerShape(8.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
     ) {
+        Column(modifier = Modifier.padding(12.dp)) {
+            Text(
+                text = value,
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+    }
+}
+
+@Composable
+fun HomeActionButton(icon: ImageVector, text: String, onClick: () -> Unit) {
+    OutlinedButton(
+        onClick = onClick,
+        modifier = Modifier.fillMaxWidth().height(54.dp),
+        shape = RoundedCornerShape(8.dp)
+    ) {
+        Icon(icon, contentDescription = null)
+        Spacer(modifier = Modifier.width(10.dp))
         Text(text, style = MaterialTheme.typography.titleMedium)
     }
 }

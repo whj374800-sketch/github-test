@@ -1,12 +1,21 @@
 [
   {
     "exerciseId": "2ORFMoR",
-    "name": "hack calf raise",
+    "name": "카프 레이즈",
     "gifUrl": "2ORFMoR.gif",
-    "targetMuscles": ["calves"],
-    "bodyParts": ["lower legs"],
-    "equipments": ["sled machine"],
-    "secondaryMuscles": ["hamstrings", "glutes"],
+    "targetMuscles": [
+      "calves"
+    ],
+    "bodyParts": [
+      "lower legs"
+    ],
+    "equipments": [
+      "sled machine"
+    ],
+    "secondaryMuscles": [
+      "hamstrings",
+      "glutes"
+    ],
     "instructions": [
       "Step:1 Adjust the sled machine to a comfortable weight.",
       "Step:2 Stand on the sled machine with your toes on the platform and your heels hanging off.",
@@ -18,12 +27,22 @@
   },
   {
     "exerciseId": "2Qh2J1e",
-    "name": "sled 45° leg press (side pov)",
+    "name": "레그 프레스",
     "gifUrl": "2Qh2J1e.gif",
-    "targetMuscles": ["glutes"],
-    "bodyParts": ["upper legs"],
-    "equipments": ["sled machine"],
-    "secondaryMuscles": ["quadriceps", "hamstrings", "calves"],
+    "targetMuscles": [
+      "glutes"
+    ],
+    "bodyParts": [
+      "upper legs"
+    ],
+    "equipments": [
+      "sled machine"
+    ],
+    "secondaryMuscles": [
+      "quadriceps",
+      "hamstrings",
+      "calves"
+    ],
     "instructions": [
       "Step:1 Adjust the seat of the sled machine so that your knees are at a 90-degree angle when your feet are on the footplate.",
       "Step:2 Sit on the sled machine with your back flat against the backrest and your feet shoulder-width apart on the footplate.",
@@ -35,12 +54,21 @@
   },
   {
     "exerciseId": "3eGE2JC",
-    "name": "dumbbell front raise",
+    "name": "덤벨 프론트 레이즈",
     "gifUrl": "3eGE2JC.gif",
-    "targetMuscles": ["delts"],
-    "bodyParts": ["shoulders"],
-    "equipments": ["dumbbell"],
-    "secondaryMuscles": ["biceps", "trapezius"],
+    "targetMuscles": [
+      "delts"
+    ],
+    "bodyParts": [
+      "shoulders"
+    ],
+    "equipments": [
+      "dumbbell"
+    ],
+    "secondaryMuscles": [
+      "biceps",
+      "trapezius"
+    ],
     "instructions": [
       "Step:1 Stand with your feet shoulder-width apart, holding a dumbbell in each hand with your palms facing your thighs.",
       "Step:2 Keeping your arms straight, exhale and lift the dumbbells in front of you until they are at shoulder level.",
@@ -50,12 +78,21 @@
   },
   {
     "exerciseId": "3tAXPQ6",
-    "name": "dumbbell over bench revers wrist curl",
+    "name": "덤벨 리버스 리스트 컬",
     "gifUrl": "3tAXPQ6.gif",
-    "targetMuscles": ["forearms"],
-    "bodyParts": ["lower arms"],
-    "equipments": ["dumbbell"],
-    "secondaryMuscles": ["biceps", "brachialis"],
+    "targetMuscles": [
+      "forearms"
+    ],
+    "bodyParts": [
+      "lower arms"
+    ],
+    "equipments": [
+      "dumbbell"
+    ],
+    "secondaryMuscles": [
+      "biceps",
+      "brachialis"
+    ],
     "instructions": [
       "Step:1 Sit on a bench with your feet flat on the ground and hold a dumbbell in each hand, palms facing down.",
       "Step:2 Rest your forearms on the bench, allowing your wrists to hang off the edge.",
@@ -66,12 +103,21 @@
   },
   {
     "exerciseId": "3TZduzM",
-    "name": "barbell incline bench press",
+    "name": "인클라인 벤치프레스",
     "gifUrl": "3TZduzM.gif",
-    "targetMuscles": ["pectorals"],
-    "bodyParts": ["chest"],
-    "equipments": ["barbell"],
-    "secondaryMuscles": ["shoulders", "triceps"],
+    "targetMuscles": [
+      "pectorals"
+    ],
+    "bodyParts": [
+      "chest"
+    ],
+    "equipments": [
+      "barbell"
+    ],
+    "secondaryMuscles": [
+      "shoulders",
+      "triceps"
+    ],
     "instructions": [
       "Step:1 Set up an incline bench at a 45-degree angle.",
       "Step:2 Lie down on the bench with your feet flat on the ground.",
@@ -83,12 +129,20 @@
   },
   {
     "exerciseId": "3XFdb1Z",
-    "name": "cable squatting curl",
+    "name": "케이블 스쿼팅 컬",
     "gifUrl": "3XFdb1Z.gif",
-    "targetMuscles": ["biceps"],
-    "bodyParts": ["upper arms"],
-    "equipments": ["cable"],
-    "secondaryMuscles": ["forearms"],
+    "targetMuscles": [
+      "biceps"
+    ],
+    "bodyParts": [
+      "upper arms"
+    ],
+    "equipments": [
+      "cable"
+    ],
+    "secondaryMuscles": [
+      "forearms"
+    ],
     "instructions": [
       "Step:1 Attach a cable handle to the lowest setting on a cable machine.",
       "Step:2 Stand facing the machine with your feet shoulder-width apart.",
@@ -102,12 +156,20 @@
   },
   {
     "exerciseId": "4dF3maG",
-    "name": "dumbbell one arm hammer preacher curl",
+    "name": "덤벨 원암 해머 프리처 컬",
     "gifUrl": "4dF3maG.gif",
-    "targetMuscles": ["biceps"],
-    "bodyParts": ["upper arms"],
-    "equipments": ["dumbbell"],
-    "secondaryMuscles": ["forearms"],
+    "targetMuscles": [
+      "biceps"
+    ],
+    "bodyParts": [
+      "upper arms"
+    ],
+    "equipments": [
+      "dumbbell"
+    ],
+    "secondaryMuscles": [
+      "forearms"
+    ],
     "instructions": [
       "Step:1 Sit on a preacher bench with a dumbbell in one hand and your upper arm resting on the pad.",
       "Step:2 Hold the dumbbell with a neutral grip (palms facing your body).",
@@ -119,12 +181,20 @@
   },
   {
     "exerciseId": "4dUn2iv",
-    "name": "barbell standing close grip curl",
+    "name": "바벨 컬",
     "gifUrl": "4dUn2iv.gif",
-    "targetMuscles": ["biceps"],
-    "bodyParts": ["upper arms"],
-    "equipments": ["barbell"],
-    "secondaryMuscles": ["forearms"],
+    "targetMuscles": [
+      "biceps"
+    ],
+    "bodyParts": [
+      "upper arms"
+    ],
+    "equipments": [
+      "barbell"
+    ],
+    "secondaryMuscles": [
+      "forearms"
+    ],
     "instructions": [
       "Step:1 Stand up straight with your feet shoulder-width apart and hold a barbell with an underhand grip, hands close together.",
       "Step:2 Keep your elbows close to your torso and your upper arms stationary throughout the movement.",
@@ -136,12 +206,22 @@
   },
   {
     "exerciseId": "5bpPTHv",
-    "name": "kettlebell pistol squat",
+    "name": "케틀벨 피스톨 스쿼트",
     "gifUrl": "5bpPTHv.gif",
-    "targetMuscles": ["glutes"],
-    "bodyParts": ["upper legs"],
-    "equipments": ["kettlebell"],
-    "secondaryMuscles": ["quadriceps", "hamstrings", "calves"],
+    "targetMuscles": [
+      "glutes"
+    ],
+    "bodyParts": [
+      "upper legs"
+    ],
+    "equipments": [
+      "kettlebell"
+    ],
+    "secondaryMuscles": [
+      "quadriceps",
+      "hamstrings",
+      "calves"
+    ],
     "instructions": [
       "Step:1 Stand with your feet shoulder-width apart, holding a kettlebell in front of your chest with both hands.",
       "Step:2 Lift your left foot off the ground and extend it forward, keeping it parallel to the ground.",
@@ -152,12 +232,21 @@
   },
   {
     "exerciseId": "05Cf2v8",
-    "name": "impossible dips",
+    "name": "딥스",
     "gifUrl": "05Cf2v8.gif",
-    "targetMuscles": ["triceps"],
-    "bodyParts": ["upper arms"],
-    "equipments": ["body weight"],
-    "secondaryMuscles": ["chest", "shoulders"],
+    "targetMuscles": [
+      "triceps"
+    ],
+    "bodyParts": [
+      "upper arms"
+    ],
+    "equipments": [
+      "body weight"
+    ],
+    "secondaryMuscles": [
+      "chest",
+      "shoulders"
+    ],
     "instructions": [
       "Step:1 Position yourself between two parallel bars with your arms fully extended and your body suspended in the air.",
       "Step:2 Bend your knees and cross your ankles.",
@@ -168,12 +257,20 @@
   },
   {
     "exerciseId": "5uFK1xr",
-    "name": "barbell seated overhead triceps extension",
+    "name": "오버헤드 트라이셉스 익스텐션",
     "gifUrl": "5uFK1xr.gif",
-    "targetMuscles": ["triceps"],
-    "bodyParts": ["upper arms"],
-    "equipments": ["barbell"],
-    "secondaryMuscles": ["shoulders"],
+    "targetMuscles": [
+      "triceps"
+    ],
+    "bodyParts": [
+      "upper arms"
+    ],
+    "equipments": [
+      "barbell"
+    ],
+    "secondaryMuscles": [
+      "shoulders"
+    ],
     "instructions": [
       "Step:1 Sit on a bench with your back straight and feet flat on the ground.",
       "Step:2 Hold a barbell with an overhand grip, hands shoulder-width apart, and raise it overhead.",
@@ -184,12 +281,21 @@
   },
   {
     "exerciseId": "5v7KYld",
-    "name": "smith incline bench press",
+    "name": "인클라인 벤치프레스",
     "gifUrl": "5v7KYld.gif",
-    "targetMuscles": ["pectorals"],
-    "bodyParts": ["chest"],
-    "equipments": ["smith machine"],
-    "secondaryMuscles": ["shoulders", "triceps"],
+    "targetMuscles": [
+      "pectorals"
+    ],
+    "bodyParts": [
+      "chest"
+    ],
+    "equipments": [
+      "smith machine"
+    ],
+    "secondaryMuscles": [
+      "shoulders",
+      "triceps"
+    ],
     "instructions": [
       "Step:1 Adjust the bench to a 30-45 degree incline.",
       "Step:2 Sit on the bench with your back flat against the pad and feet firmly on the ground.",
@@ -201,12 +307,21 @@
   },
   {
     "exerciseId": "6bOA1Oi",
-    "name": "weighted side bend (on stability ball)",
+    "name": "웨이티드 사이드 밴드",
     "gifUrl": "6bOA1Oi.gif",
-    "targetMuscles": ["abs"],
-    "bodyParts": ["waist"],
-    "equipments": ["weighted"],
-    "secondaryMuscles": ["obliques", "lower back"],
+    "targetMuscles": [
+      "abs"
+    ],
+    "bodyParts": [
+      "waist"
+    ],
+    "equipments": [
+      "weighted"
+    ],
+    "secondaryMuscles": [
+      "obliques",
+      "lower back"
+    ],
     "instructions": [
       "Step:1 Sit on a stability ball with your feet shoulder-width apart and flat on the ground.",
       "Step:2 Hold a weight in one hand and place your other hand on your hip.",
@@ -217,12 +332,21 @@
   },
   {
     "exerciseId": "6cKQC5E",
-    "name": "dumbbell one arm upright row",
+    "name": "덤벨 원암 업라이트 로우",
     "gifUrl": "6cKQC5E.gif",
-    "targetMuscles": ["delts"],
-    "bodyParts": ["shoulders"],
-    "equipments": ["dumbbell"],
-    "secondaryMuscles": ["traps", "biceps"],
+    "targetMuscles": [
+      "delts"
+    ],
+    "bodyParts": [
+      "shoulders"
+    ],
+    "equipments": [
+      "dumbbell"
+    ],
+    "secondaryMuscles": [
+      "traps",
+      "biceps"
+    ],
     "instructions": [
       "Step:1 Stand with your feet shoulder-width apart, holding a dumbbell in one hand with an overhand grip.",
       "Step:2 Let the dumbbell hang at arm's length in front of your thighs, with your palm facing your body.",
@@ -233,12 +357,21 @@
   },
   {
     "exerciseId": "6HiHHe0",
-    "name": "barbell standing rocking leg calf raise",
+    "name": "카프 레이즈",
     "gifUrl": "6HiHHe0.gif",
-    "targetMuscles": ["calves"],
-    "bodyParts": ["lower legs"],
-    "equipments": ["barbell"],
-    "secondaryMuscles": ["hamstrings", "quadriceps"],
+    "targetMuscles": [
+      "calves"
+    ],
+    "bodyParts": [
+      "lower legs"
+    ],
+    "equipments": [
+      "barbell"
+    ],
+    "secondaryMuscles": [
+      "hamstrings",
+      "quadriceps"
+    ],
     "instructions": [
       "Step:1 Stand with your feet shoulder-width apart and hold a barbell across your upper back.",
       "Step:2 Raise your heels off the ground as high as possible, balancing on the balls of your feet.",
@@ -248,12 +381,21 @@
   },
   {
     "exerciseId": "6kSxYnw",
-    "name": "barbell wrist curl v. 2",
+    "name": "바벨 리스트 컬",
     "gifUrl": "6kSxYnw.gif",
-    "targetMuscles": ["forearms"],
-    "bodyParts": ["lower arms"],
-    "equipments": ["barbell"],
-    "secondaryMuscles": ["biceps", "brachialis"],
+    "targetMuscles": [
+      "forearms"
+    ],
+    "bodyParts": [
+      "lower arms"
+    ],
+    "equipments": [
+      "barbell"
+    ],
+    "secondaryMuscles": [
+      "biceps",
+      "brachialis"
+    ],
     "instructions": [
       "Step:1 Sit on a bench with your feet flat on the ground and your knees bent.",
       "Step:2 Hold a barbell with an underhand grip, palms facing up, and your hands shoulder-width apart.",
@@ -265,12 +407,20 @@
   },
   {
     "exerciseId": "6MfS53i",
-    "name": "dumbbell lying single extension",
+    "name": "라잉 트라이셉스 익스텐션",
     "gifUrl": "6MfS53i.gif",
-    "targetMuscles": ["triceps"],
-    "bodyParts": ["upper arms"],
-    "equipments": ["dumbbell"],
-    "secondaryMuscles": ["shoulders"],
+    "targetMuscles": [
+      "triceps"
+    ],
+    "bodyParts": [
+      "upper arms"
+    ],
+    "equipments": [
+      "dumbbell"
+    ],
+    "secondaryMuscles": [
+      "shoulders"
+    ],
     "instructions": [
       "Step:1 Lie flat on a bench with a dumbbell in one hand and your arm fully extended above your chest.",
       "Step:2 Lower the dumbbell in a controlled manner towards your forehead, keeping your upper arm stationary.",
@@ -280,12 +430,20 @@
   },
   {
     "exerciseId": "6sMAmNv",
-    "name": "dumbbell reverse spider curl",
+    "name": "덤벨 리버스 스파이더 컬",
     "gifUrl": "6sMAmNv.gif",
-    "targetMuscles": ["biceps"],
-    "bodyParts": ["upper arms"],
-    "equipments": ["dumbbell"],
-    "secondaryMuscles": ["forearms"],
+    "targetMuscles": [
+      "biceps"
+    ],
+    "bodyParts": [
+      "upper arms"
+    ],
+    "equipments": [
+      "dumbbell"
+    ],
+    "secondaryMuscles": [
+      "forearms"
+    ],
     "instructions": [
       "Step:1 Stand up straight with a dumbbell in each hand, palms facing your body and arms fully extended.",
       "Step:2 Keeping your upper arms stationary, exhale and curl the weights while contracting your biceps.",
@@ -297,12 +455,21 @@
   },
   {
     "exerciseId": "6sYyrRX",
-    "name": "bent knee lying twist (male)",
+    "name": "누워서 무릎 굽혀 트위스트",
     "gifUrl": "6sYyrRX.gif",
-    "targetMuscles": ["glutes"],
-    "bodyParts": ["upper legs"],
-    "equipments": ["body weight"],
-    "secondaryMuscles": ["obliques", "hip flexors"],
+    "targetMuscles": [
+      "glutes"
+    ],
+    "bodyParts": [
+      "upper legs"
+    ],
+    "equipments": [
+      "body weight"
+    ],
+    "secondaryMuscles": [
+      "obliques",
+      "hip flexors"
+    ],
     "instructions": [
       "Step:1 Lie flat on your back with your knees bent and feet flat on the ground.",
       "Step:2 Extend your arms out to the sides, perpendicular to your body.",
@@ -314,12 +481,22 @@
   },
   {
     "exerciseId": "7F1DVzn",
-    "name": "lever front pulldown",
+    "name": "렛풀다운",
     "gifUrl": "7F1DVzn.gif",
-    "targetMuscles": ["lats"],
-    "bodyParts": ["back"],
-    "equipments": ["leverage machine"],
-    "secondaryMuscles": ["biceps", "rhomboids", "rear deltoids"],
+    "targetMuscles": [
+      "lats"
+    ],
+    "bodyParts": [
+      "back"
+    ],
+    "equipments": [
+      "leverage machine"
+    ],
+    "secondaryMuscles": [
+      "biceps",
+      "rhomboids",
+      "rear deltoids"
+    ],
     "instructions": [
       "Step:1 Adjust the seat height and position yourself on the machine with your knees under the pads and your feet flat on the ground.",
       "Step:2 Grasp the handles with an overhand grip, slightly wider than shoulder-width apart.",
@@ -331,12 +508,21 @@
   },
   {
     "exerciseId": "7I6LNUG",
-    "name": "lever seated row",
+    "name": "시티드 케이블 로우",
     "gifUrl": "7I6LNUG.gif",
-    "targetMuscles": ["upper back"],
-    "bodyParts": ["back"],
-    "equipments": ["leverage machine"],
-    "secondaryMuscles": ["biceps", "forearms"],
+    "targetMuscles": [
+      "upper back"
+    ],
+    "bodyParts": [
+      "back"
+    ],
+    "equipments": [
+      "leverage machine"
+    ],
+    "secondaryMuscles": [
+      "biceps",
+      "forearms"
+    ],
     "instructions": [
       "Step:1 Adjust the seat height and footrests to a comfortable position.",
       "Step:2 Sit on the machine with your chest against the pad and your feet on the footrests.",
@@ -350,12 +536,20 @@
   },
   {
     "exerciseId": "7inpWch",
-    "name": "dumbbell standing concentration curl",
+    "name": "덤벨 컨센트레이션 컬",
     "gifUrl": "7inpWch.gif",
-    "targetMuscles": ["biceps"],
-    "bodyParts": ["upper arms"],
-    "equipments": ["dumbbell"],
-    "secondaryMuscles": ["forearms"],
+    "targetMuscles": [
+      "biceps"
+    ],
+    "bodyParts": [
+      "upper arms"
+    ],
+    "equipments": [
+      "dumbbell"
+    ],
+    "secondaryMuscles": [
+      "forearms"
+    ],
     "instructions": [
       "Step:1 Stand with your feet shoulder-width apart and hold a dumbbell in one hand, with your arm fully extended and palm facing inwards.",
       "Step:2 Place your opposite hand on your thigh for support.",
@@ -368,12 +562,21 @@
   },
   {
     "exerciseId": "7saC5zz",
-    "name": "cable decline fly",
+    "name": "덤벨 플라이",
     "gifUrl": "7saC5zz.gif",
-    "targetMuscles": ["pectorals"],
-    "bodyParts": ["chest"],
-    "equipments": ["cable"],
-    "secondaryMuscles": ["shoulders", "triceps"],
+    "targetMuscles": [
+      "pectorals"
+    ],
+    "bodyParts": [
+      "chest"
+    ],
+    "equipments": [
+      "cable"
+    ],
+    "secondaryMuscles": [
+      "shoulders",
+      "triceps"
+    ],
     "instructions": [
       "Step:1 Adjust the cable machine to a decline position.",
       "Step:2 Stand facing away from the machine with your feet shoulder-width apart.",
@@ -385,12 +588,22 @@
   },
   {
     "exerciseId": "7zdxRTl",
-    "name": "smith leg press",
+    "name": "레그 프레스",
     "gifUrl": "7zdxRTl.gif",
-    "targetMuscles": ["glutes"],
-    "bodyParts": ["upper legs"],
-    "equipments": ["smith machine"],
-    "secondaryMuscles": ["quadriceps", "hamstrings", "calves"],
+    "targetMuscles": [
+      "glutes"
+    ],
+    "bodyParts": [
+      "upper legs"
+    ],
+    "equipments": [
+      "smith machine"
+    ],
+    "secondaryMuscles": [
+      "quadriceps",
+      "hamstrings",
+      "calves"
+    ],
     "instructions": [
       "Step:1 Adjust the seat and footplate of the smith machine to a comfortable position.",
       "Step:2 Sit on the machine with your back against the backrest and your feet shoulder-width apart on the footplate.",
@@ -403,12 +616,21 @@
   },
   {
     "exerciseId": "8eqjhOl",
-    "name": "dumbbell palms in incline bench press",
+    "name": "인클라인 덤벨 프레스",
     "gifUrl": "8eqjhOl.gif",
-    "targetMuscles": ["triceps"],
-    "bodyParts": ["upper arms"],
-    "equipments": ["dumbbell"],
-    "secondaryMuscles": ["chest", "shoulders"],
+    "targetMuscles": [
+      "triceps"
+    ],
+    "bodyParts": [
+      "upper arms"
+    ],
+    "equipments": [
+      "dumbbell"
+    ],
+    "secondaryMuscles": [
+      "chest",
+      "shoulders"
+    ],
     "instructions": [
       "Step:1 Set up an incline bench at a 45-degree angle.",
       "Step:2 Sit on the bench with your back against the backrest and feet flat on the ground.",
@@ -421,12 +643,21 @@
   },
   {
     "exerciseId": "8K0w2yA",
-    "name": "assisted hanging knee raise with throw down",
+    "name": "어시스트 행잉 니 레이즈",
     "gifUrl": "8K0w2yA.gif",
-    "targetMuscles": ["abs"],
-    "bodyParts": ["waist"],
-    "equipments": ["assisted"],
-    "secondaryMuscles": ["hip flexors", "lower back"],
+    "targetMuscles": [
+      "abs"
+    ],
+    "bodyParts": [
+      "waist"
+    ],
+    "equipments": [
+      "assisted"
+    ],
+    "secondaryMuscles": [
+      "hip flexors",
+      "lower back"
+    ],
     "instructions": [
       "Step:1 Hang from a pull-up bar with your arms fully extended and your palms facing away from you.",
       "Step:2 Engage your core and lift your knees towards your chest, keeping your legs together.",
@@ -436,12 +667,20 @@
   },
   {
     "exerciseId": "8oYqOt9",
-    "name": "cable seated curl",
+    "name": "케이블 시티드 컬",
     "gifUrl": "8oYqOt9.gif",
-    "targetMuscles": ["biceps"],
-    "bodyParts": ["upper arms"],
-    "equipments": ["cable"],
-    "secondaryMuscles": ["forearms"],
+    "targetMuscles": [
+      "biceps"
+    ],
+    "bodyParts": [
+      "upper arms"
+    ],
+    "equipments": [
+      "cable"
+    ],
+    "secondaryMuscles": [
+      "forearms"
+    ],
     "instructions": [
       "Step:1 Sit on a cable machine with your feet flat on the ground and your back straight.",
       "Step:2 Grasp the cable attachment with an underhand grip, palms facing up, and your arms fully extended.",
@@ -453,12 +692,21 @@
   },
   {
     "exerciseId": "8ozhUIZ",
-    "name": "barbell standing calf raise",
+    "name": "카프 레이즈",
     "gifUrl": "8ozhUIZ.gif",
-    "targetMuscles": ["calves"],
-    "bodyParts": ["lower legs"],
-    "equipments": ["barbell"],
-    "secondaryMuscles": ["hamstrings", "glutes"],
+    "targetMuscles": [
+      "calves"
+    ],
+    "bodyParts": [
+      "lower legs"
+    ],
+    "equipments": [
+      "barbell"
+    ],
+    "secondaryMuscles": [
+      "hamstrings",
+      "glutes"
+    ],
     "instructions": [
       "Step:1 Stand with your feet shoulder-width apart and place a barbell across your upper back.",
       "Step:2 Raise your heels off the ground as high as possible, using only your toes.",
@@ -468,12 +716,21 @@
   },
   {
     "exerciseId": "8urJS9b",
-    "name": "weighted hyperextension (on stability ball)",
+    "name": "웨이티드 하이퍼익스텐션",
     "gifUrl": "8urJS9b.gif",
-    "targetMuscles": ["spine"],
-    "bodyParts": ["back"],
-    "equipments": ["weighted"],
-    "secondaryMuscles": ["glutes", "hamstrings"],
+    "targetMuscles": [
+      "spine"
+    ],
+    "bodyParts": [
+      "back"
+    ],
+    "equipments": [
+      "weighted"
+    ],
+    "secondaryMuscles": [
+      "glutes",
+      "hamstrings"
+    ],
     "instructions": [
       "Step:1 Position yourself face down on a stability ball with your hips resting on the ball and your feet against a wall for stability.",
       "Step:2 Place your hands behind your head or cross them over your chest.",
@@ -484,18 +741,616 @@
   },
   {
     "exerciseId": "8xUv4J7",
-    "name": "cable seated crunch",
+    "name": "케이블 시티드 크런치",
     "gifUrl": "8xUv4J7.gif",
-    "targetMuscles": ["abs"],
-    "bodyParts": ["waist"],
-    "equipments": ["cable"],
-    "secondaryMuscles": ["obliques"],
+    "targetMuscles": [
+      "abs"
+    ],
+    "bodyParts": [
+      "waist"
+    ],
+    "equipments": [
+      "cable"
+    ],
+    "secondaryMuscles": [
+      "obliques"
+    ],
     "instructions": [
       "Step:1 Sit on a cable machine with your feet flat on the ground and your knees bent.",
       "Step:2 Hold the cable handle with both hands and position it behind your head.",
       "Step:3 Engage your abs and slowly curl your upper body forward, bringing your chest towards your knees.",
       "Step:4 Pause for a moment at the top, then slowly return to the starting position.",
       "Step:5 Repeat for the desired number of repetitions."
+    ]
+  },
+  {
+    "exerciseId": "template_dumbbell_shoulder_press",
+    "name": "덤벨 숄더 프레스",
+    "gifUrl": "template_dumbbell_shoulder_press.gif",
+    "targetMuscles": [
+      "delts"
+    ],
+    "bodyParts": [
+      "shoulders"
+    ],
+    "equipments": [
+      "dumbbell"
+    ],
+    "secondaryMuscles": [
+      "triceps",
+      "upper chest"
+    ],
+    "instructions": [
+      "Step:1 Sit or stand with a dumbbell in each hand at shoulder height.",
+      "Step:2 Brace your core and press the dumbbells overhead until your arms are extended.",
+      "Step:3 Lower the dumbbells back to shoulder height under control.",
+      "Step:4 Repeat for the desired number of repetitions."
+    ]
+  },
+  {
+    "exerciseId": "template_deadlift",
+    "name": "데드리프트",
+    "gifUrl": "template_deadlift.gif",
+    "targetMuscles": [
+      "glutes"
+    ],
+    "bodyParts": [
+      "back",
+      "upper legs"
+    ],
+    "equipments": [
+      "barbell"
+    ],
+    "secondaryMuscles": [
+      "hamstrings",
+      "spine",
+      "trapezius",
+      "forearms"
+    ],
+    "instructions": [
+      "Step:1 Stand with your mid-foot under the barbell and your feet about hip-width apart.",
+      "Step:2 Hinge at the hips, grip the bar, and keep your back neutral.",
+      "Step:3 Push through the floor and extend your hips and knees to stand tall.",
+      "Step:4 Lower the bar by hinging at the hips and controlling the descent."
+    ]
+  },
+  {
+    "exerciseId": "template_deadlift_bbb",
+    "name": "데드리프트 (BBB)",
+    "gifUrl": "template_deadlift_bbb.gif",
+    "targetMuscles": [
+      "glutes"
+    ],
+    "bodyParts": [
+      "back",
+      "upper legs"
+    ],
+    "equipments": [
+      "barbell"
+    ],
+    "secondaryMuscles": [
+      "hamstrings",
+      "spine",
+      "trapezius",
+      "forearms"
+    ],
+    "instructions": [
+      "Step:1 Set up as you would for a standard barbell deadlift.",
+      "Step:2 Use the prescribed BBB volume weight and keep each repetition controlled.",
+      "Step:3 Stand tall by extending your hips and knees.",
+      "Step:4 Lower the bar with a neutral spine and repeat for all prescribed reps."
+    ]
+  },
+  {
+    "exerciseId": "template_leg_extension",
+    "name": "레그 익스텐션",
+    "gifUrl": "template_leg_extension.gif",
+    "targetMuscles": [
+      "quadriceps"
+    ],
+    "bodyParts": [
+      "upper legs"
+    ],
+    "equipments": [
+      "leverage machine"
+    ],
+    "secondaryMuscles": [],
+    "instructions": [
+      "Step:1 Sit on the leg extension machine with the pad above your ankles.",
+      "Step:2 Extend your knees until your legs are nearly straight.",
+      "Step:3 Squeeze your quadriceps briefly at the top.",
+      "Step:4 Lower the weight under control and repeat."
+    ]
+  },
+  {
+    "exerciseId": "template_leg_curl",
+    "name": "레그 컬",
+    "gifUrl": "template_leg_curl.gif",
+    "targetMuscles": [
+      "hamstrings"
+    ],
+    "bodyParts": [
+      "upper legs"
+    ],
+    "equipments": [
+      "leverage machine"
+    ],
+    "secondaryMuscles": [
+      "calves"
+    ],
+    "instructions": [
+      "Step:1 Set up on the leg curl machine with the pad secured near your ankles.",
+      "Step:2 Curl your heels toward your hips by bending your knees.",
+      "Step:3 Pause briefly while contracting your hamstrings.",
+      "Step:4 Return to the starting position under control."
+    ]
+  },
+  {
+    "exerciseId": "template_barbell_deadlift",
+    "name": "바벨 데드리프트",
+    "gifUrl": "template_barbell_deadlift.gif",
+    "targetMuscles": [
+      "glutes"
+    ],
+    "bodyParts": [
+      "back",
+      "upper legs"
+    ],
+    "equipments": [
+      "barbell"
+    ],
+    "secondaryMuscles": [
+      "hamstrings",
+      "spine",
+      "trapezius",
+      "forearms"
+    ],
+    "instructions": [
+      "Step:1 Stand with the barbell over your mid-foot.",
+      "Step:2 Grip the bar and set your back in a neutral position.",
+      "Step:3 Drive through your feet and stand up with the bar close to your body.",
+      "Step:4 Lower the bar under control and repeat."
+    ]
+  },
+  {
+    "exerciseId": "template_barbell_row",
+    "name": "바벨 로우",
+    "gifUrl": "template_barbell_row.gif",
+    "targetMuscles": [
+      "upper back"
+    ],
+    "bodyParts": [
+      "back"
+    ],
+    "equipments": [
+      "barbell"
+    ],
+    "secondaryMuscles": [
+      "lats",
+      "biceps",
+      "forearms"
+    ],
+    "instructions": [
+      "Step:1 Hold a barbell with an overhand grip and hinge forward at the hips.",
+      "Step:2 Keep your back neutral and pull the bar toward your lower ribs.",
+      "Step:3 Squeeze your shoulder blades together at the top.",
+      "Step:4 Lower the bar under control and repeat."
+    ]
+  },
+  {
+    "exerciseId": "template_barbell_romanian_deadlift",
+    "name": "바벨 루마니안 데드리프트",
+    "gifUrl": "template_barbell_romanian_deadlift.gif",
+    "targetMuscles": [
+      "hamstrings"
+    ],
+    "bodyParts": [
+      "upper legs"
+    ],
+    "equipments": [
+      "barbell"
+    ],
+    "secondaryMuscles": [
+      "glutes",
+      "spine"
+    ],
+    "instructions": [
+      "Step:1 Stand holding a barbell in front of your thighs.",
+      "Step:2 Hinge your hips back while keeping a slight bend in your knees.",
+      "Step:3 Lower the bar along your legs until you feel a hamstring stretch.",
+      "Step:4 Drive your hips forward to return to standing."
+    ]
+  },
+  {
+    "exerciseId": "template_barbell_bench_press",
+    "name": "바벨 벤치프레스",
+    "gifUrl": "template_barbell_bench_press.gif",
+    "targetMuscles": [
+      "pectorals"
+    ],
+    "bodyParts": [
+      "chest"
+    ],
+    "equipments": [
+      "barbell"
+    ],
+    "secondaryMuscles": [
+      "triceps",
+      "delts"
+    ],
+    "instructions": [
+      "Step:1 Lie on a bench with your feet planted and grip the bar slightly wider than shoulder-width.",
+      "Step:2 Unrack the bar and lower it to your chest under control.",
+      "Step:3 Press the bar upward until your arms are extended.",
+      "Step:4 Repeat for the desired number of repetitions."
+    ]
+  },
+  {
+    "exerciseId": "template_barbell_squat",
+    "name": "바벨 스쿼트",
+    "gifUrl": "template_barbell_squat.gif",
+    "targetMuscles": [
+      "quadriceps"
+    ],
+    "bodyParts": [
+      "upper legs"
+    ],
+    "equipments": [
+      "barbell"
+    ],
+    "secondaryMuscles": [
+      "glutes",
+      "hamstrings",
+      "calves"
+    ],
+    "instructions": [
+      "Step:1 Place the barbell across your upper back and stand with your feet about shoulder-width apart.",
+      "Step:2 Brace your core and descend by bending your hips and knees.",
+      "Step:3 Squat until you reach your target depth while keeping your chest up.",
+      "Step:4 Drive through your feet to stand back up."
+    ]
+  },
+  {
+    "exerciseId": "template_bench_press",
+    "name": "벤치프레스",
+    "gifUrl": "template_bench_press.gif",
+    "targetMuscles": [
+      "pectorals"
+    ],
+    "bodyParts": [
+      "chest"
+    ],
+    "equipments": [
+      "barbell"
+    ],
+    "secondaryMuscles": [
+      "triceps",
+      "delts"
+    ],
+    "instructions": [
+      "Step:1 Lie on a flat bench and grip the bar slightly wider than shoulder-width.",
+      "Step:2 Lower the bar to your chest with control.",
+      "Step:3 Press the bar back up until your arms are extended.",
+      "Step:4 Repeat for the desired number of repetitions."
+    ]
+  },
+  {
+    "exerciseId": "template_bench_press_bbb",
+    "name": "벤치프레스 (BBB)",
+    "gifUrl": "template_bench_press_bbb.gif",
+    "targetMuscles": [
+      "pectorals"
+    ],
+    "bodyParts": [
+      "chest"
+    ],
+    "equipments": [
+      "barbell"
+    ],
+    "secondaryMuscles": [
+      "triceps",
+      "delts"
+    ],
+    "instructions": [
+      "Step:1 Set up for a standard barbell bench press.",
+      "Step:2 Use the prescribed BBB volume weight and maintain consistent technique.",
+      "Step:3 Lower the bar to your chest under control.",
+      "Step:4 Press back up and repeat for all prescribed reps."
+    ]
+  },
+  {
+    "exerciseId": "template_side_lateral_raise",
+    "name": "사이드 레터럴 레이즈",
+    "gifUrl": "template_side_lateral_raise.gif",
+    "targetMuscles": [
+      "delts"
+    ],
+    "bodyParts": [
+      "shoulders"
+    ],
+    "equipments": [
+      "dumbbell"
+    ],
+    "secondaryMuscles": [
+      "trapezius"
+    ],
+    "instructions": [
+      "Step:1 Stand with a dumbbell in each hand at your sides.",
+      "Step:2 Raise your arms out to the sides until they reach shoulder height.",
+      "Step:3 Keep a slight bend in your elbows and avoid swinging.",
+      "Step:4 Lower the dumbbells under control and repeat."
+    ]
+  },
+  {
+    "exerciseId": "template_sumo_deadlift",
+    "name": "스모 데드리프트",
+    "gifUrl": "template_sumo_deadlift.gif",
+    "targetMuscles": [
+      "glutes"
+    ],
+    "bodyParts": [
+      "upper legs",
+      "back"
+    ],
+    "equipments": [
+      "barbell"
+    ],
+    "secondaryMuscles": [
+      "hamstrings",
+      "quadriceps",
+      "adductors"
+    ],
+    "instructions": [
+      "Step:1 Stand with a wide stance and your toes turned slightly outward.",
+      "Step:2 Grip the bar inside your knees and keep your chest up.",
+      "Step:3 Push through the floor and extend your hips and knees to stand tall.",
+      "Step:4 Lower the bar under control and repeat."
+    ]
+  },
+  {
+    "exerciseId": "template_squat",
+    "name": "스쿼트",
+    "gifUrl": "template_squat.gif",
+    "targetMuscles": [
+      "quadriceps"
+    ],
+    "bodyParts": [
+      "upper legs"
+    ],
+    "equipments": [
+      "barbell"
+    ],
+    "secondaryMuscles": [
+      "glutes",
+      "hamstrings",
+      "calves"
+    ],
+    "instructions": [
+      "Step:1 Stand with your feet about shoulder-width apart and brace your core.",
+      "Step:2 Bend your hips and knees to lower into a squat.",
+      "Step:3 Keep your chest up and knees tracking with your toes.",
+      "Step:4 Push through your feet to return to standing."
+    ]
+  },
+  {
+    "exerciseId": "template_squat_bbb",
+    "name": "스쿼트 (BBB)",
+    "gifUrl": "template_squat_bbb.gif",
+    "targetMuscles": [
+      "quadriceps"
+    ],
+    "bodyParts": [
+      "upper legs"
+    ],
+    "equipments": [
+      "barbell"
+    ],
+    "secondaryMuscles": [
+      "glutes",
+      "hamstrings",
+      "calves"
+    ],
+    "instructions": [
+      "Step:1 Set up for a standard barbell squat.",
+      "Step:2 Use the prescribed BBB volume weight and controlled tempo.",
+      "Step:3 Squat to your target depth while maintaining posture.",
+      "Step:4 Stand back up and repeat for all prescribed reps."
+    ]
+  },
+  {
+    "exerciseId": "template_stiff_leg_deadlift",
+    "name": "스티프 레그 데드리프트",
+    "gifUrl": "template_stiff_leg_deadlift.gif",
+    "targetMuscles": [
+      "hamstrings"
+    ],
+    "bodyParts": [
+      "upper legs"
+    ],
+    "equipments": [
+      "barbell"
+    ],
+    "secondaryMuscles": [
+      "glutes",
+      "spine"
+    ],
+    "instructions": [
+      "Step:1 Hold a barbell in front of your thighs with your knees only slightly bent.",
+      "Step:2 Hinge forward at the hips and lower the bar along your legs.",
+      "Step:3 Keep your back neutral and feel the stretch in your hamstrings.",
+      "Step:4 Extend your hips to return to standing."
+    ]
+  },
+  {
+    "exerciseId": "template_overhead_press",
+    "name": "오버헤드 프레스",
+    "gifUrl": "template_overhead_press.gif",
+    "targetMuscles": [
+      "delts"
+    ],
+    "bodyParts": [
+      "shoulders"
+    ],
+    "equipments": [
+      "barbell"
+    ],
+    "secondaryMuscles": [
+      "triceps",
+      "upper chest"
+    ],
+    "instructions": [
+      "Step:1 Stand with the barbell at shoulder height and your core braced.",
+      "Step:2 Press the bar overhead until your arms are extended.",
+      "Step:3 Keep the bar path close and avoid excessive back arching.",
+      "Step:4 Lower the bar to shoulder height and repeat."
+    ]
+  },
+  {
+    "exerciseId": "template_overhead_press_bbb",
+    "name": "오버헤드 프레스 (BBB)",
+    "gifUrl": "template_overhead_press_bbb.gif",
+    "targetMuscles": [
+      "delts"
+    ],
+    "bodyParts": [
+      "shoulders"
+    ],
+    "equipments": [
+      "barbell"
+    ],
+    "secondaryMuscles": [
+      "triceps",
+      "upper chest"
+    ],
+    "instructions": [
+      "Step:1 Set up for a standard overhead press.",
+      "Step:2 Use the prescribed BBB volume weight and keep each repetition strict.",
+      "Step:3 Press the bar overhead and lock out under control.",
+      "Step:4 Lower the bar and repeat for all prescribed reps."
+    ]
+  },
+  {
+    "exerciseId": "template_calf_exercise",
+    "name": "종아리 운동",
+    "gifUrl": "template_calf_exercise.gif",
+    "targetMuscles": [
+      "calves"
+    ],
+    "bodyParts": [
+      "lower legs"
+    ],
+    "equipments": [
+      "body weight",
+      "machine",
+      "barbell"
+    ],
+    "secondaryMuscles": [],
+    "instructions": [
+      "Step:1 Stand with the balls of your feet supported and your heels free to move.",
+      "Step:2 Raise your heels as high as possible by contracting your calves.",
+      "Step:3 Pause briefly at the top.",
+      "Step:4 Lower your heels under control and repeat."
+    ]
+  },
+  {
+    "exerciseId": "template_kettlebell_swing_bodyweight_substitute",
+    "name": "케틀벨 스윙 (맨몸 대체)",
+    "gifUrl": "template_kettlebell_swing_bodyweight_substitute.gif",
+    "targetMuscles": [
+      "glutes"
+    ],
+    "bodyParts": [
+      "upper legs"
+    ],
+    "equipments": [
+      "kettlebell",
+      "body weight"
+    ],
+    "secondaryMuscles": [
+      "hamstrings",
+      "core",
+      "shoulders"
+    ],
+    "instructions": [
+      "Step:1 Stand with your feet slightly wider than shoulder-width and hold a kettlebell with both hands.",
+      "Step:2 Hinge at the hips and let the kettlebell swing back between your legs.",
+      "Step:3 Drive your hips forward explosively to swing the kettlebell to chest height.",
+      "Step:4 Let the kettlebell return naturally and repeat."
+    ]
+  },
+  {
+    "exerciseId": "template_close_grip_bench_press",
+    "name": "클로즈 그립 벤치프레스",
+    "gifUrl": "template_close_grip_bench_press.gif",
+    "targetMuscles": [
+      "triceps"
+    ],
+    "bodyParts": [
+      "upper arms",
+      "chest"
+    ],
+    "equipments": [
+      "barbell"
+    ],
+    "secondaryMuscles": [
+      "pectorals",
+      "delts"
+    ],
+    "instructions": [
+      "Step:1 Lie on a bench and grip the bar slightly narrower than shoulder-width.",
+      "Step:2 Lower the bar toward your lower chest while keeping your elbows controlled.",
+      "Step:3 Press the bar back up by extending your elbows.",
+      "Step:4 Repeat for the desired number of repetitions."
+    ]
+  },
+  {
+    "exerciseId": "template_pull_up",
+    "name": "풀업",
+    "gifUrl": "template_pull_up.gif",
+    "targetMuscles": [
+      "lats"
+    ],
+    "bodyParts": [
+      "back"
+    ],
+    "equipments": [
+      "body weight"
+    ],
+    "secondaryMuscles": [
+      "biceps",
+      "upper back",
+      "forearms"
+    ],
+    "instructions": [
+      "Step:1 Hang from a pull-up bar with an overhand grip.",
+      "Step:2 Brace your core and pull your chest toward the bar.",
+      "Step:3 Squeeze your back at the top of the movement.",
+      "Step:4 Lower yourself under control until your arms are extended."
+    ]
+  },
+  {
+    "exerciseId": "template_front_squat",
+    "name": "프론트 스쿼트",
+    "gifUrl": "template_front_squat.gif",
+    "targetMuscles": [
+      "quadriceps"
+    ],
+    "bodyParts": [
+      "upper legs"
+    ],
+    "equipments": [
+      "barbell"
+    ],
+    "secondaryMuscles": [
+      "glutes",
+      "hamstrings",
+      "core"
+    ],
+    "instructions": [
+      "Step:1 Rack the barbell across the front of your shoulders.",
+      "Step:2 Keep your elbows high and brace your core.",
+      "Step:3 Squat down while keeping your torso upright.",
+      "Step:4 Drive through your feet to return to standing."
     ]
   }
 ]

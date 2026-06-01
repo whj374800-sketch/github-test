@@ -3,14 +3,19 @@ package com.example.physicaltraining.ui.screen
 import android.graphics.Paint
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -29,6 +34,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.physicaltraining.ui.WorkoutViewModel
 import java.text.SimpleDateFormat
@@ -84,26 +90,29 @@ fun GraphScreen(viewModel: WorkoutViewModel) {
     val volumeData = weeklyGraphData.map {
         it.weekLabel to it.volume
     }
+    val bestWeight = weeklyGraphData.maxOfOrNull { it.maxWeight } ?: 0f
+    val latestWeight = weeklyGraphData.lastOrNull()?.maxWeight ?: 0f
+    val totalVolume = weeklyGraphData.sumOf { it.volume.toDouble() }.toFloat()
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
-            .verticalScroll(rememberScrollState())
+            .verticalScroll(rememberScrollState()),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Text(
-            text = "성장 그래프",
-            style = MaterialTheme.typography.headlineMedium
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Text(
-            text = "5대 운동의 주차별 최고 중량과 총 볼륨 변화를 확인합니다.",
-            style = MaterialTheme.typography.bodyMedium
-        )
-
-        Spacer(modifier = Modifier.height(24.dp))
+        Column {
+            Text(
+                text = "성장 그래프",
+                style = MaterialTheme.typography.headlineLarge,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = "주차별 최고 중량과 총 볼륨 변화를 확인합니다.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
 
         ExposedDropdownMenuBox(
             expanded = expanded,
@@ -138,65 +147,128 @@ fun GraphScreen(viewModel: WorkoutViewModel) {
             }
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
-
         if (weeklyGraphData.isEmpty()) {
-            Text(
-                text = "아직 완료된 운동 히스토리가 없습니다.\n루틴을 완료하면 그래프가 표시됩니다.",
-                style = MaterialTheme.typography.bodyLarge
-            )
-        } else {
-            Text(
-                text = "주차별 최고 중량",
-                style = MaterialTheme.typography.titleLarge
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            VolumeLineChart(
-                data = weightData,
-                suffix = "kg",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(280.dp)
-                    .background(
-                        color = MaterialTheme.colorScheme.surfaceVariant,
-                        shape = MaterialTheme.shapes.medium
-                    )
-                    .padding(16.dp)
-            )
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            Text(
-                text = "주차별 총 볼륨",
-                style = MaterialTheme.typography.titleLarge
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            VolumeLineChart(
-                data = volumeData,
-                suffix = "",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(280.dp)
-                    .background(
-                        color = MaterialTheme.colorScheme.surfaceVariant,
-                        shape = MaterialTheme.shapes.medium
-                    )
-                    .padding(16.dp)
-            )
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            weeklyGraphData.forEachIndexed { index, item ->
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(8.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+            ) {
                 Text(
-                    text = "${index + 1}. ${item.weekLabel} | 최고 중량 ${item.maxWeight}kg | 총 볼륨 ${item.volume.toInt()}",
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.padding(vertical = 4.dp)
+                    text = "아직 완료된 운동 히스토리가 없습니다.\n루틴을 완료하면 그래프가 표시됩니다.",
+                    style = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier.padding(18.dp)
                 )
             }
+        } else {
+            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                GraphMetricCard(
+                    label = "최고 중량",
+                    value = "${formatGraphValue(bestWeight)}kg",
+                    modifier = Modifier.weight(1f)
+                )
+                GraphMetricCard(
+                    label = "최근 기록",
+                    value = "${formatGraphValue(latestWeight)}kg",
+                    modifier = Modifier.weight(1f)
+                )
+                GraphMetricCard(
+                    label = "총 볼륨",
+                    value = totalVolume.toInt().toString(),
+                    modifier = Modifier.weight(1f)
+                )
+            }
+
+            ChartCard(title = "주차별 최고 중량") {
+                VolumeLineChart(
+                    data = weightData,
+                    suffix = "kg",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(260.dp)
+                        .background(
+                            color = MaterialTheme.colorScheme.surfaceVariant,
+                            shape = RoundedCornerShape(8.dp)
+                        )
+                        .padding(16.dp)
+                )
+            }
+
+            ChartCard(title = "주차별 총 볼륨") {
+                VolumeLineChart(
+                    data = volumeData,
+                    suffix = "",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(260.dp)
+                        .background(
+                            color = MaterialTheme.colorScheme.surfaceVariant,
+                            shape = RoundedCornerShape(8.dp)
+                        )
+                        .padding(16.dp)
+                )
+            }
+
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(8.dp)
+            ) {
+                Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(
+                        text = "주차별 기록",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                    weeklyGraphData.forEachIndexed { index, item ->
+                        Text(
+                            text = "${index + 1}. ${item.weekLabel}  최고 ${formatGraphValue(item.maxWeight)}kg  볼륨 ${item.volume.toInt()}",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun GraphMetricCard(label: String, value: String, modifier: Modifier = Modifier) {
+    Card(
+        modifier = modifier,
+        shape = RoundedCornerShape(8.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+    ) {
+        Column(modifier = Modifier.padding(12.dp)) {
+            Text(
+                text = value,
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+    }
+}
+
+@Composable
+fun ChartCard(title: String, content: @Composable () -> Unit) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(8.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold
+            )
+            content()
         }
     }
 }
@@ -307,7 +379,7 @@ fun VolumeLineChart(
             )
 
             drawContext.canvas.nativeCanvas.drawText(
-                "${data[index].second.toInt()}$suffix",
+                "${formatGraphValue(data[index].second)}$suffix",
                 point.x,
                 point.y - 16f,
                 labelPaint
@@ -320,5 +392,13 @@ fun VolumeLineChart(
                 labelPaint
             )
         }
+    }
+}
+
+private fun formatGraphValue(value: Float): String {
+    return if (value % 1f == 0f) {
+        value.toInt().toString()
+    } else {
+        String.format(Locale.getDefault(), "%.1f", value)
     }
 }

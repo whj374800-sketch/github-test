@@ -1,4 +1,4 @@
-package com.example.physicaltraining.ui.Screen
+package com.example.physicaltraining.ui.screen
 
 import com.example.physicaltraining.ui.auth.AuthViewModel
 import androidx.compose.foundation.layout.Arrangement

@@ -38,6 +38,12 @@ data class DailyRoutine(
     val exercises: Map<String, List<WorkoutSet>> = emptyMap()
 )
 
+data class WeeklyProgressionRequest(
+    val programName: String,
+    val routineCount: Int,
+    val setCount: Int
+)
+
 class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() {
 
     private val _workoutHistory =
@@ -62,10 +68,19 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
     private val _routines = MutableStateFlow<List<DailyRoutine>>(emptyList())
     val routines = _routines.asStateFlow()
 
+    private val _weeklyProgressionRequest = MutableStateFlow<WeeklyProgressionRequest?>(null)
+    val weeklyProgressionRequest = _weeklyProgressionRequest.asStateFlow()
+
     private val _userProfile =
         MutableStateFlow<UserProfileEntity?>(null)
 
     val userProfile = _userProfile.asStateFlow()
+
+    private val _isUserProfileLoaded = MutableStateFlow(false)
+    val isUserProfileLoaded = _isUserProfileLoaded.asStateFlow()
+
+    private var firebaseBackupUserId: String = "test_user"
+    private var hasRestoredWorkoutHistoryFromFirebase = false
 
     init {
         loadRoutinesFromDb()
@@ -77,6 +92,21 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
         if (modelManager == null) {
             modelManager = WorkoutModelManager(context)
         }
+    }
+
+    fun setFirebaseBackupUserId(userId: String?) {
+        val nextUserId = userId?.takeIf { it.isNotBlank() } ?: "test_user"
+        if (nextUserId != firebaseBackupUserId) {
+            hasRestoredWorkoutHistoryFromFirebase = false
+        }
+        firebaseBackupUserId = nextUserId
+    }
+
+    fun restoreWorkoutHistoryFromFirebaseOnce() {
+        if (hasRestoredWorkoutHistoryFromFirebase) return
+
+        hasRestoredWorkoutHistoryFromFirebase = true
+        restoreWorkoutHistoryFromFirebase(firebaseBackupUserId)
     }
 
     fun getAiRecommendation(inputData: FloatArray): FloatArray {
@@ -204,10 +234,7 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
         toggleSEtEntity?.let { entity ->
             viewModelScope.launch {
                 repository.updateSet(entity)
-
-                if (entity.isChecked) {
-                    checkAndCreateNextWeekRoutine(routineId)
-                }
+                checkAndCreateNextWeekRoutine(routineId)
             }
         }
     }
@@ -461,27 +488,35 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
 
 
     fun saveUserProfile(
+        name: String,
         age: Int,
         weight: Float,
-        gender: String
+        gender: String,
+        experience: String,
+        goal: String
     ) {
         viewModelScope.launch {
 
             val profile = UserProfileEntity(
+                name = name,
                 age = age,
                 weight = weight,
-                gender = gender
+                gender = gender,
+                experience = experience,
+                goal = goal
             )
 
             repository.saveUserProfile(profile)
 
             _userProfile.value = profile
+            _isUserProfileLoaded.value = true
         }
     }
 
     private fun loadUserProfile() {
         viewModelScope.launch {
             _userProfile.value = repository.getUserProfile()
+            _isUserProfileLoaded.value = true
         }
     }
 
@@ -517,6 +552,62 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
         }
     }
 
+    fun cancelWeeklyProgression() {
+        _weeklyProgressionRequest.value = null
+    }
+
+    fun confirmWeeklyProgression() {
+        val request = _weeklyProgressionRequest.value ?: return
+
+        viewModelScope.launch {
+            val weeklyRoutines = _routines.value.filter {
+                getProgramName(it.name) == request.programName && isCurrentWeekRoutine(it.name)
+            }
+
+            weeklyRoutines.forEach { routine ->
+                routine.exercises.forEach { (exerciseName, sets) ->
+                    sets.forEach { set ->
+                        val nextWeight = if (shouldKeepBodyweightOnly(exerciseName) || set.weight <= 0f) {
+                            set.weight
+                        } else {
+                            ProgressionManager.calculateNextWeight(
+                                routineName = routine.name,
+                                exerciseName = exerciseName,
+                                currentWeight = set.weight,
+                                allSetsSuccess = true,
+                                currentReps = set.reps,
+                                targetReps = set.reps
+                            )
+                        }
+
+                        repository.updateSet(
+                            WorkoutSetEntity(
+                                setId = set.setId,
+                                routineId = routine.id,
+                                exerciseName = exerciseName,
+                                weight = nextWeight,
+                                reps = set.reps,
+                                isChecked = false,
+                                restTime = set.restTime
+                            )
+                        )
+                    }
+                }
+
+                repository.updateRoutine(
+                    RoutineEntity(
+                        id = routine.id,
+                        name = routine.name,
+                        isCompleted = false,
+                        nextRoutineGenerated = false
+                    )
+                )
+            }
+
+            _weeklyProgressionRequest.value = null
+        }
+    }
+
     private suspend fun checkAndCreateNextWeekRoutine(routineId: String) {
         val routine = _routines.value.find { it.id == routineId } ?: return
 
@@ -528,6 +619,7 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
         val historyEntities = routine.exercises.flatMap { (exerciseName, sets) ->
             sets.map { set ->
                 WorkoutHistoryEntity(
+                    historyId = set.setId,
                     routineId = routine.id,
                     routineName = routine.name,
                     exerciseName = exerciseName,
@@ -539,66 +631,48 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
         }
 
         repository.insertWorkoutHistory(historyEntities)
+        backupWorkoutHistorySnapshotToFirebase()
 
         if (!isAllCompleted) return
 
-        val nextRoutineName = "${routine.name} - 다음주"
-
-        val alreadyExists =
-            _routines.value.any { it.name == nextRoutineName }
-
-        if (alreadyExists) return
-
-        val nextRoutineId = UUID.randomUUID().toString()
-
-        val nextSetEntities = mutableListOf<WorkoutSetEntity>()
-
-        routine.exercises.forEach { (exerciseName, sets) ->
-            val lastSet = sets.lastOrNull() ?: return@forEach
-
-            val nextWeight =
-                ProgressionManager.calculateNextWeight(
-                    routineName = routine.name,
-                    exerciseName = exerciseName,
-                    currentWeight = lastSet.weight,
-                    allSetsSuccess = true,
-                    currentReps = lastSet.reps,
-                    targetReps = lastSet.reps
-                )
-
-            sets.forEach { set ->
-                nextSetEntities.add(
-                    WorkoutSetEntity(
-                        routineId = nextRoutineId,
-                        exerciseName = exerciseName,
-                        weight = nextWeight,
-                        reps = set.reps,
-                        isChecked = false,
-                        restTime = set.restTime
-                    )
-                )
-            }
-        }
-
-        repository.insertRoutine(
-            RoutineEntity(
-                id = nextRoutineId,
-                name = nextRoutineName
-            )
-        )
-
-        if (nextSetEntities.isNotEmpty()) {
-            repository.insertSets(nextSetEntities)
-        }
         repository.updateRoutine(
             RoutineEntity(
                 id = routine.id,
                 name = routine.name,
                 isCompleted = true,
-                nextRoutineGenerated = true
+                nextRoutineGenerated = false
             )
         )
 
+        val programName = getProgramName(routine.name)
+        val weeklyRoutines = _routines.value.filter {
+            getProgramName(it.name) == programName && isCurrentWeekRoutine(it.name)
+        }
+        val allWeeklyRoutinesCompleted = weeklyRoutines.isNotEmpty() &&
+                weeklyRoutines.all { weeklyRoutine ->
+                    weeklyRoutine.exercises.values.flatten().isNotEmpty() &&
+                            weeklyRoutine.exercises.values.flatten().all { it.isChecked }
+                }
+
+        if (allWeeklyRoutinesCompleted && _weeklyProgressionRequest.value == null) {
+            _weeklyProgressionRequest.value = WeeklyProgressionRequest(
+                programName = programName,
+                routineCount = weeklyRoutines.size,
+                setCount = weeklyRoutines.sumOf { it.exercises.values.sumOf { sets -> sets.size } }
+            )
+        }
+    }
+
+    private fun getProgramName(routineName: String): String {
+        return routineName.substringBefore(" - ").trim()
+    }
+
+    private fun isCurrentWeekRoutine(routineName: String): Boolean {
+        return !routineName.contains("다음주")
+    }
+
+    private fun shouldKeepBodyweightOnly(exerciseName: String): Boolean {
+        return exerciseName == "풀업" || exerciseName == "딥스"
     }
 
     private fun loadWorkoutHistory() {
@@ -611,16 +685,17 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
 
     fun backupWorkoutHistoryToFirebase(userId: String = "test_user") {
         viewModelScope.launch {
+            val targetUserId = if (userId == "test_user") firebaseBackupUserId else userId
 
             Log.d("FIREBASE_TEST", "업로드 개수: ${_workoutHistory.value.size}")
 
             try {
                 repository.backupWorkoutHistoryToFirebase(
-                    userId = userId,
+                    userId = targetUserId,
                     historyList = _workoutHistory.value
                 )
 
-                Log.d("FIREBASE_BACKUP", "운동 히스토리 백업 성공")
+                Log.d("FIREBASE_BACKUP", "운동 히스토리 백업 성공 userId=$targetUserId")
             } catch (e: Exception) {
                 Log.e("FIREBASE_BACKUP", "운동 히스토리 백업 실패", e)
 
@@ -631,16 +706,36 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
 
     fun restoreWorkoutHistoryFromFirebase(userId: String = "test_user") {
         viewModelScope.launch {
-            try {
-                Log.d("FIREBASE_RESTORE", "복원 시작 userId = $userId")
+            val targetUserId = if (userId == "test_user") firebaseBackupUserId else userId
 
-                repository.restoreWorkoutHistoryFromFirebase(userId)
+            try {
+                Log.d("FIREBASE_RESTORE", "복원 시작 userId = $targetUserId")
+
+                repository.restoreWorkoutHistoryFromFirebase(targetUserId)
 
                 Log.d("FIREBASE_RESTORE", "운동 히스토리 복원 성공")
 
             } catch (e: Exception) {
                 Log.e("FIREBASE_RESTORE", "운동 히스토리 복원 실패", e)
             }
+        }
+    }
+
+    private suspend fun backupWorkoutHistorySnapshotToFirebase() {
+        try {
+            val latestHistory = repository.getAllWorkoutHistory().first()
+
+            repository.backupWorkoutHistoryToFirebase(
+                userId = firebaseBackupUserId,
+                historyList = latestHistory
+            )
+
+            Log.d(
+                "FIREBASE_BACKUP",
+                "토글 직후 자동 백업 성공 userId=$firebaseBackupUserId count=${latestHistory.size}"
+            )
+        } catch (e: Exception) {
+            Log.e("FIREBASE_BACKUP", "토글 직후 자동 백업 실패", e)
         }
     }
 

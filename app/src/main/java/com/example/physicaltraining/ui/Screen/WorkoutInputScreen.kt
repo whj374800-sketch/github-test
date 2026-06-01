@@ -61,20 +61,20 @@ fun WorkoutInputScreen(
 
     val profile by viewModel.userProfile.collectAsState()
 
-    var gender by remember { mutableStateOf(profile?.gender ?:"남성") }
-    var weight by remember { mutableStateOf(profile?.weight?.toString() ?: "") }
+    var gender by remember(profile) { mutableStateOf(profile?.gender ?: "남성") }
+    var weight by remember(profile) { mutableStateOf(profile?.weight?.toString() ?: "") }
 
 
-    var age by remember {
+    var age by remember(profile) {
         mutableStateOf(profile?.age?.toString() ?: "")
     }
 
 
-    var experience by remember { mutableStateOf("초보자") }
+    var experience by remember(profile) { mutableStateOf(profile?.experience ?: "초보자") }
     var expExpanded by remember { mutableStateOf(false) }
     val expOptions = listOf("초보자", "중급자", "상급자")
 
-    var goal by remember { mutableStateOf("근비대") }
+    var goal by remember(profile) { mutableStateOf(profile?.goal ?: "근비대") }
     var goalExpanded by remember { mutableStateOf(false) }
     val goalOptions = listOf("근비대", "스트렝스", "다이어트", "유지/재활")
 
@@ -250,9 +250,12 @@ fun WorkoutInputScreen(
                     val userAge = age.toFloatOrNull() ?: 25f
 
                     viewModel.saveUserProfile(
+                        name = profile?.name?.takeIf { it.isNotBlank() } ?: userName,
                         age = userAge.toInt(),
                         weight = userWeight,
-                        gender = gender
+                        gender = gender,
+                        experience = experience,
+                        goal = goal
 
                     )
 
