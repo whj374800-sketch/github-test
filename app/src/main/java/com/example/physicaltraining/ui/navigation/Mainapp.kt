@@ -212,9 +212,11 @@ fun HomeScreen(
     val nextRoutine = routines.firstOrNull { routine ->
         routine.exercises.values.flatten().any { !it.isChecked }
     } ?: routines.firstOrNull()
-    val totalSets = routines.sumOf { routine -> routine.exercises.values.sumOf { it.size } }
-    val completedSets = routines.sumOf { routine -> routine.exercises.values.flatten().count { it.isChecked } }
+    val currentRoutineSets = nextRoutine?.exercises?.values?.flatten().orEmpty()
+    val totalSets = currentRoutineSets.size
+    val completedSets = currentRoutineSets.count { it.isChecked }
     val progress = if (totalSets == 0) 0f else completedSets / totalSets.toFloat()
+    val completedHistoryCount = history.count { it.isCompleted }
 
     Column(
         modifier = Modifier
@@ -283,7 +285,7 @@ fun HomeScreen(
         Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             HomeMetric("루틴", routines.size.toString(), Modifier.weight(1f))
             HomeMetric("운동", routines.sumOf { it.exercises.size }.toString(), Modifier.weight(1f))
-            HomeMetric("기록", history.size.toString(), Modifier.weight(1f))
+            HomeMetric("기록", completedHistoryCount.toString(), Modifier.weight(1f))
         }
 
         Text("빠른 메뉴", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)

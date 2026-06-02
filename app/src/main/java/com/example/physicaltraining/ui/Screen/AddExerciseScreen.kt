@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
@@ -28,7 +27,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -45,7 +43,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -86,7 +83,6 @@ fun AddExerciseScreen(
     var selectedExercise by remember {
         mutableStateOf(groupedCatalog.firstOrNull()?.second?.firstOrNull() ?: displayCatalog.firstOrNull())
     }
-    var restTime by remember { mutableStateOf("60") }
 
     Scaffold(
         topBar = {
@@ -114,35 +110,30 @@ fun AddExerciseScreen(
             )
         },
         bottomBar = {
-            Row(
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                OutlinedTextField(
-                    value = restTime,
-                    onValueChange = { restTime = it },
-                    label = { Text("휴식") },
-                    suffix = { Text("초") },
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    modifier = Modifier.weight(0.8f)
+                Text(
+                    text = "프로필 목표와 AI 3대 운동값으로 세트, 횟수, 무게, 휴식시간이 자동 설정됩니다.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Button(
                     onClick = {
                         selectedExercise?.let {
                             viewModel.addExerciseToRoutine(
+                                context = context,
                                 routineId = routine.id,
-                                exerciseName = it.name,
-                                restTime = restTime.toIntOrNull() ?: 60
+                                exerciseName = it.name
                             )
                             navController.popBackStack()
                         }
                     },
                     modifier = Modifier
-                        .weight(1f)
+                        .fillMaxWidth()
                         .height(56.dp),
                     shape = RoundedCornerShape(8.dp),
                     colors = ButtonDefaults.buttonColors(

@@ -85,6 +85,7 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
     init {
         loadRoutinesFromDb()
         loadUserProfile()
+        cleanupIncompleteWorkoutHistory()
         loadWorkoutHistory()
     }
 
@@ -155,8 +156,18 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
         }
     }
 
-    fun addExerciseToRoutine(routineId: String, exerciseName: String, restTime: Int = 60) {
+    fun addExerciseToRoutine(context: Context, routineId: String, exerciseName: String) {
         if (exerciseName.isBlank()) return
+
+        val prescription = buildAddedExercisePrescription(context, exerciseName)
+        val initialSets = List(prescription.sets) {
+            WorkoutSet(
+                weight = prescription.weight,
+                reps = prescription.reps,
+                isChecked = false,
+                restTime = prescription.restTime
+            )
+        }
 
         _routines.update { currentList ->
             currentList.map { routine ->
@@ -164,26 +175,20 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
                     val newMap = routine.exercises.toMutableMap()
 
                     if (!newMap.containsKey(exerciseName)) {
-                        val initialSet = WorkoutSet(
-                            weight = 0f,
-                            reps = 0,
-                            isChecked = false,
-                            restTime = restTime
-                        )
-                        newMap[exerciseName] = listOf(initialSet)
+                        newMap[exerciseName] = initialSets
 
                         viewModelScope.launch {
                             repository.insertSets(
-                                listOf(
+                                initialSets.map { set ->
                                     WorkoutSetEntity(
                                         routineId = routineId,
                                         exerciseName = exerciseName,
-                                        weight = 0f,
-                                        reps = 0,
+                                        weight = set.weight,
+                                        reps = set.reps,
                                         isChecked = false,
-                                        restTime = restTime
+                                        restTime = set.restTime
                                     )
-                                )
+                                }
                             )
                         }
 
@@ -194,6 +199,56 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
                 } else routine
             }
         }
+    }
+
+    private fun buildAddedExercisePrescription(
+        context: Context,
+        exerciseName: String
+    ) = RoutineWeightCalculator().calculateAddedExercisePrescription(
+        aiResult = getProfileBasedAiLiftResult(context),
+        exerciseName = exerciseName,
+        goal = _userProfile.value?.goal ?: "근비대"
+    )
+
+    private fun getProfileBasedAiLiftResult(context: Context): FloatArray {
+        val profile = _userProfile.value
+        if (profile != null) {
+            initModel(context)
+            val aiInput = floatArrayOf(
+                if (profile.gender == "남성") 1f else 0f,
+                profile.weight,
+                profile.age.toFloat(),
+                when (profile.experience) {
+                    "상급자" -> 3f
+                    "중급자" -> 2f
+                    else -> 1f
+                },
+                if (profile.goal == "스트렝스") 1f else 0f
+            )
+            val aiResult = modelManager?.predict(aiInput)
+
+            if (aiResult != null && aiResult.size >= 3 && aiResult.take(3).all { it > 0f }) {
+                return aiResult
+            }
+        }
+
+        return fallbackAiLiftResult(profile)
+    }
+
+    private fun fallbackAiLiftResult(profile: UserProfileEntity?): FloatArray {
+        val bodyWeight = profile?.weight?.takeIf { it > 0f } ?: 70f
+        val genderScale = if (profile?.gender == "여성") 0.72f else 1f
+        val experienceScale = when (profile?.experience) {
+            "상급자" -> 1.25f
+            "중급자" -> 1.0f
+            else -> 0.75f
+        }
+
+        val bench = bodyWeight * 0.75f * genderScale * experienceScale
+        val squat = bodyWeight * 1.05f * genderScale * experienceScale
+        val deadlift = bodyWeight * 1.25f * genderScale * experienceScale
+
+        return floatArrayOf(bench, squat, deadlift, 0f)
     }
 
     fun toggleSet(routineId: String, exercise: String, setIndex: Int) {
@@ -234,6 +289,8 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
         toggleSEtEntity?.let { entity ->
             viewModelScope.launch {
                 repository.updateSet(entity)
+                syncWorkoutHistoryForToggledSet(routineId, entity)
+                backupWorkoutHistorySnapshotToFirebase()
                 checkAndCreateNextWeekRoutine(routineId)
             }
         }
@@ -348,6 +405,10 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
                     routine.copy(exercises = newExercise)
                 } else routine
             }
+        }
+
+        viewModelScope.launch {
+            repository.deleteSetsByExercise(routineId, exerciseName)
         }
     }
 
@@ -616,23 +677,6 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
                 .flatten()
                 .all { it.isChecked }
 
-        val historyEntities = routine.exercises.flatMap { (exerciseName, sets) ->
-            sets.map { set ->
-                WorkoutHistoryEntity(
-                    historyId = set.setId,
-                    routineId = routine.id,
-                    routineName = routine.name,
-                    exerciseName = exerciseName,
-                    weight = set.weight,
-                    reps = set.reps,
-                    isCompleted = set.isChecked
-                )
-            }
-        }
-
-        repository.insertWorkoutHistory(historyEntities)
-        backupWorkoutHistorySnapshotToFirebase()
-
         if (!isAllCompleted) return
 
         repository.updateRoutine(
@@ -663,6 +707,37 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
         }
     }
 
+    private suspend fun syncWorkoutHistoryForToggledSet(
+        routineId: String,
+        setEntity: WorkoutSetEntity
+    ) {
+        if (setEntity.setId == 0) return
+
+        if (!setEntity.isChecked) {
+            repository.deleteWorkoutHistoryById(setEntity.setId)
+            return
+        }
+
+        val routineName = _routines.value
+            .find { it.id == routineId }
+            ?.name
+            ?: return
+
+        repository.insertWorkoutHistory(
+            listOf(
+                WorkoutHistoryEntity(
+                    historyId = setEntity.setId,
+                    routineId = routineId,
+                    routineName = routineName,
+                    exerciseName = setEntity.exerciseName,
+                    weight = setEntity.weight,
+                    reps = setEntity.reps,
+                    isCompleted = true
+                )
+            )
+        )
+    }
+
     private fun getProgramName(routineName: String): String {
         return routineName.substringBefore(" - ").trim()
     }
@@ -683,16 +758,24 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
         }
     }
 
+    private fun cleanupIncompleteWorkoutHistory() {
+        viewModelScope.launch {
+            repository.deleteIncompleteWorkoutHistory()
+        }
+    }
+
     fun backupWorkoutHistoryToFirebase(userId: String = "test_user") {
         viewModelScope.launch {
             val targetUserId = if (userId == "test_user") firebaseBackupUserId else userId
 
-            Log.d("FIREBASE_TEST", "업로드 개수: ${_workoutHistory.value.size}")
+            val completedHistory = _workoutHistory.value.filter { it.isCompleted }
+
+            Log.d("FIREBASE_TEST", "업로드 개수: ${completedHistory.size}")
 
             try {
                 repository.backupWorkoutHistoryToFirebase(
                     userId = targetUserId,
-                    historyList = _workoutHistory.value
+                    historyList = completedHistory
                 )
 
                 Log.d("FIREBASE_BACKUP", "운동 히스토리 백업 성공 userId=$targetUserId")
@@ -723,7 +806,9 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
 
     private suspend fun backupWorkoutHistorySnapshotToFirebase() {
         try {
-            val latestHistory = repository.getAllWorkoutHistory().first()
+            val latestHistory = repository.getAllWorkoutHistory()
+                .first()
+                .filter { it.isCompleted }
 
             repository.backupWorkoutHistoryToFirebase(
                 userId = firebaseBackupUserId,

@@ -18,7 +18,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -55,7 +55,12 @@ import com.example.physicaltraining.ui.WorkoutViewModel
 import com.example.physicaltraining.ui.navigation.AppRoute
 
 private fun isBodyWeightOnlyExercise(exerciseName: String): Boolean {
-    return exerciseName == "풀업" || exerciseName == "딥스"
+    return exerciseName == "풀업" ||
+            exerciseName == "딥스" ||
+            exerciseName == "푸쉬업" ||
+            exerciseName == "플랭크" ||
+            exerciseName == "크런치" ||
+            exerciseName == "행잉 레그 레이즈"
 }
 
 @Composable
@@ -69,6 +74,7 @@ fun CheckListScreen(routineId: String, viewModel: WorkoutViewModel, navControlle
     }
 
     var showSetDialogFor by remember { mutableStateOf<String?>(null) }
+    var showExerciseDeleteDialogFor by remember { mutableStateOf<String?>(null) }
     var inputWeight by remember { mutableStateOf("") }
     var inputReps by remember { mutableStateOf("") }
     val totalSets = currentRoutine.exercises.values.sumOf { it.size }
@@ -157,6 +163,13 @@ fun CheckListScreen(routineId: String, viewModel: WorkoutViewModel, navControlle
                             }) {
                                 Icon(Icons.Default.PlayArrow, "타이머 시작", tint = MaterialTheme.colorScheme.primary)
                             }
+                            IconButton(onClick = { showExerciseDeleteDialogFor = exercise }) {
+                                Icon(
+                                    Icons.Default.Close,
+                                    "운동 삭제",
+                                    tint = MaterialTheme.colorScheme.error
+                                )
+                            }
                         }
 
                         HorizontalDivider()
@@ -184,7 +197,7 @@ fun CheckListScreen(routineId: String, viewModel: WorkoutViewModel, navControlle
                                     fontWeight = FontWeight.Bold
                                 )
                                 Text(
-                                    text = if (isBodyWeightOnlyExercise(exercise)) "-" else "${setInfo.weight}",
+                                    text = if (isBodyWeightOnlyExercise(exercise) || setInfo.weight <= 0f) "-" else "${setInfo.weight}",
                                     modifier = Modifier.weight(1f),
                                     style = MaterialTheme.typography.bodyLarge
                                 )
@@ -214,7 +227,7 @@ fun CheckListScreen(routineId: String, viewModel: WorkoutViewModel, navControlle
                                     modifier = Modifier.width(48.dp)
                                 ) {
                                     Icon(
-                                        Icons.Default.Delete,
+                                        Icons.Default.Close,
                                         "세트 삭제",
                                         tint = MaterialTheme.colorScheme.error
                                     )
@@ -269,6 +282,23 @@ fun CheckListScreen(routineId: String, viewModel: WorkoutViewModel, navControlle
             },
             dismissButton = {
                 TextButton(onClick = { showSetDialogFor = null }) { Text("취소") }
+            }
+        )
+    }
+
+    showExerciseDeleteDialogFor?.let { exerciseName ->
+        AlertDialog(
+            onDismissRequest = { showExerciseDeleteDialogFor = null },
+            title = { Text("운동 삭제") },
+            text = { Text("$exerciseName 운동과 포함된 모든 세트를 삭제할까요?") },
+            confirmButton = {
+                TextButton(onClick = {
+                    viewModel.deleteExercise(currentRoutine.id, exerciseName)
+                    showExerciseDeleteDialogFor = null
+                }) { Text("삭제", color = MaterialTheme.colorScheme.error) }
+            },
+            dismissButton = {
+                TextButton(onClick = { showExerciseDeleteDialogFor = null }) { Text("취소") }
             }
         )
     }

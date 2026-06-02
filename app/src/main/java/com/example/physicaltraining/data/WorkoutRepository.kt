@@ -67,6 +67,14 @@ class WorkoutRepository(
         workoutDao.insertWorkoutHistory(history)
     }
 
+    suspend fun deleteWorkoutHistoryById(historyId: Int) {
+        workoutDao.deleteWorkoutHistoryById(historyId)
+    }
+
+    suspend fun deleteIncompleteWorkoutHistory() {
+        workoutDao.deleteIncompleteWorkoutHistory()
+    }
+
     suspend fun backupWorkoutHistoryToFirebase(
         userId: String,
         historyList: List<WorkoutHistoryEntity>

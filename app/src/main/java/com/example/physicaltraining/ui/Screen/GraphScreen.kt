@@ -64,7 +64,7 @@ fun GraphScreen(viewModel: WorkoutViewModel) {
     var expanded by remember { mutableStateOf(false) }
 
     val filteredHistory = workoutHistory.filter { history ->
-        history.exerciseName.contains(selectedExercise)
+        history.isCompleted && history.exerciseName.contains(selectedExercise)
     }
 
     val weeklyGraphData = filteredHistory

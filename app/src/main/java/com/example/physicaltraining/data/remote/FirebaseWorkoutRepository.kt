@@ -12,13 +12,22 @@ class FirebaseWorkoutRepository {
         userId: String,
         historyList: List<WorkoutHistoryEntity>
     ) {
+        val historyCollection = firestore
+            .collection("users")
+            .document(userId)
+            .collection("workout_history")
         val batch = firestore.batch()
 
+        historyCollection
+            .get()
+            .await()
+            .documents
+            .forEach { document ->
+                batch.delete(document.reference)
+            }
+
         historyList.forEach { history ->
-            val docRef = firestore
-                .collection("users")
-                .document(userId)
-                .collection("workout_history")
+            val docRef = historyCollection
                 .document(history.historyId.toString())
 
             val data = hashMapOf(
