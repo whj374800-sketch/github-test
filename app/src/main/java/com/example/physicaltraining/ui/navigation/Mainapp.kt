@@ -47,6 +47,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.physicaltraining.ui.WorkoutViewModel
+import com.example.physicaltraining.ui.screen.AddExerciseScreen
 import com.example.physicaltraining.ui.screen.CheckListScreen
 import com.example.physicaltraining.ui.screen.GraphScreen
 import com.example.physicaltraining.ui.screen.RestTimeBar
@@ -103,6 +104,14 @@ fun MainApp(
             ) { backStackEntry ->
                 val routineId = backStackEntry.arguments?.getString("routineId") ?: ""
                 CheckListScreen(routineId = routineId, viewModel = viewModel, navController = navController)
+            }
+
+            composable(
+                route = AppRoute.AddExercise.route,
+                arguments = listOf(navArgument("routineId") { type = NavType.StringType })
+            ) { backStackEntry ->
+                val routineId = backStackEntry.arguments?.getString("routineId") ?: ""
+                AddExerciseScreen(routineId = routineId, viewModel = viewModel, navController = navController)
             }
 
 

@@ -9,6 +9,10 @@ sealed class AppRoute(val route: String) {
         fun createRoute(routineId: String) = "checklist/$routineId"
     }
 
+    object AddExercise : AppRoute("add_exercise/{routineId}") {
+        fun createRoute(routineId: String) = "add_exercise/$routineId"
+    }
+
     object Timer : AppRoute("timer/{routineId}/{exerciseName}/{initialTime}") {
         fun createRoute(
             routineId: String,

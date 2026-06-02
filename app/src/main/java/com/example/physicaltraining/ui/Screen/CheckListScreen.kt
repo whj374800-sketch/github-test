@@ -68,7 +68,6 @@ fun CheckListScreen(routineId: String, viewModel: WorkoutViewModel, navControlle
         return
     }
 
-    var showAddExerciseDialog by remember { mutableStateOf(false) }
     var showSetDialogFor by remember { mutableStateOf<String?>(null) }
     var inputWeight by remember { mutableStateOf("") }
     var inputReps by remember { mutableStateOf("") }
@@ -81,7 +80,9 @@ fun CheckListScreen(routineId: String, viewModel: WorkoutViewModel, navControlle
         bottomBar = {
             Box(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
                 Button(
-                    onClick = { showAddExerciseDialog = true },
+                    onClick = {
+                        navController.navigate(AppRoute.AddExercise.createRoute(currentRoutine.id))
+                    },
                     modifier = Modifier.fillMaxWidth().height(56.dp),
                     shape = RoundedCornerShape(8.dp),
                     colors = ButtonDefaults.buttonColors(
@@ -234,20 +235,6 @@ fun CheckListScreen(routineId: String, viewModel: WorkoutViewModel, navControlle
         }
     }
 
-    if (showAddExerciseDialog) {
-        AddExerciseFromCatalogDialog(
-            onDismiss = { showAddExerciseDialog = false },
-            onConfirm = { exerciseName, restTime ->
-                viewModel.addExerciseToRoutine(
-                    routineId = currentRoutine.id,
-                    exerciseName = exerciseName,
-                    restTime = restTime
-                )
-                showAddExerciseDialog = false
-            }
-        )
-    }
-
     showSetDialogFor?.let { exerciseName ->
         AlertDialog(
             onDismissRequest = { showSetDialogFor = null },
@@ -284,169 +271,5 @@ fun CheckListScreen(routineId: String, viewModel: WorkoutViewModel, navControlle
                 TextButton(onClick = { showSetDialogFor = null }) { Text("취소") }
             }
         )
-    }
-}
-
-@Composable
-fun AddExerciseFromCatalogDialog(
-    onDismiss: () -> Unit,
-    onConfirm: (String, Int) -> Unit
-) {
-    val context = LocalContext.current
-    val catalog = remember { loadRoutineExerciseCatalog(context) }
-    var selectedExercise by remember { mutableStateOf(catalog.firstOrNull()) }
-    var restTime by remember { mutableStateOf("60") }
-
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text("운동 종목 추가") },
-        text = {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(max = 560.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                selectedExercise?.let { selected ->
-                    ExercisePreviewCard(item = selected)
-                }
-
-                OutlinedTextField(
-                    value = restTime,
-                    onValueChange = { restTime = it },
-                    label = { Text("휴식 시간 (초)") },
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(280.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    items(catalog) { item ->
-                        val isSelected = item.name == selectedExercise?.name
-                        ExerciseCatalogRow(
-                            item = item,
-                            selected = isSelected,
-                            onClick = { selectedExercise = item }
-                        )
-                    }
-                }
-            }
-        },
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    selectedExercise?.let {
-                        onConfirm(it.name, restTime.toIntOrNull() ?: 60)
-                    }
-                }
-            ) {
-                Text("추가")
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text("취소")
-            }
-        }
-    )
-}
-
-@Composable
-private fun ExercisePreviewCard(item: RoutineExerciseCatalogItem) {
-    val context = LocalContext.current
-    val imageBitmap = remember(item.imageAsset) {
-        item.imageAsset?.let { loadAssetImageBitmap(context, it) }
-    }
-
-    Card(
-        shape = RoundedCornerShape(8.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
-    ) {
-        Column(
-            modifier = Modifier.padding(12.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Text(
-                text = item.name,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
-            )
-
-            if (imageBitmap != null) {
-                Image(
-                    bitmap = imageBitmap,
-                    contentDescription = item.name,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(150.dp),
-                    contentScale = ContentScale.Fit
-                )
-            } else {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(84.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = "등록된 운동 이미지가 없습니다.",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            }
-
-            Text(
-                text = item.description,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
-    }
-}
-
-@Composable
-private fun ExerciseCatalogRow(
-    item: RoutineExerciseCatalogItem,
-    selected: Boolean,
-    onClick: () -> Unit
-) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick),
-        shape = RoundedCornerShape(8.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = if (selected) {
-                MaterialTheme.colorScheme.primaryContainer
-            } else {
-                MaterialTheme.colorScheme.surface
-            }
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = if (selected) 2.dp else 0.dp)
-    ) {
-        Row(
-            modifier = Modifier.padding(12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = item.name,
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    text = if (item.matched) "이미지 매칭됨" else "이미지 없음",
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-        }
     }
 }

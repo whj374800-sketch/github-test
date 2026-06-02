@@ -14,6 +14,7 @@ import com.example.physicaltraining.ui.WorkoutViewModel
 import com.example.physicaltraining.ui.navigation.MainApp
 import com.example.physicaltraining.ui.screen.LoginScreen
 import com.example.physicaltraining.ui.screen.ProfileSetupScreen
+import com.example.physicaltraining.ui.theme.PhysicalTrainingTheme
 
 @Composable
 fun PhysicalTrainingRoot(
@@ -33,33 +34,35 @@ fun PhysicalTrainingRoot(
         }
     }
 
-    if (authState.isLoggedIn) {
-        when {
-            !isUserProfileLoaded -> {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator()
+    PhysicalTrainingTheme {
+        if (authState.isLoggedIn) {
+            when {
+                !isUserProfileLoaded -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                }
+
+                userProfile == null -> {
+                    ProfileSetupScreen(viewModel = workoutViewModel)
+                }
+
+                else -> {
+                    MainApp(
+                        viewModel = workoutViewModel,
+                        onLogout = {
+                            authViewModel.logout()
+                        }
+                    )
                 }
             }
-
-            userProfile == null -> {
-                ProfileSetupScreen(viewModel = workoutViewModel)
-            }
-
-            else -> {
-                MainApp(
-                    viewModel = workoutViewModel,
-                    onLogout = {
-                        authViewModel.logout()
-                    }
-                )
-            }
+        } else {
+            LoginScreen(
+                authViewModel = authViewModel
+            )
         }
-    } else {
-        LoginScreen(
-            authViewModel = authViewModel
-        )
     }
 }

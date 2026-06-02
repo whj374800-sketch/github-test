@@ -206,6 +206,138 @@
       "matched": true,
       "imageAsset": "routine_images/front_squat.png",
       "note": "프론트 스쿼트 사진 매칭"
+    },
+    {
+      "name": "프론트 레이즈",
+      "matched": true,
+      "imageAsset": "routine_images/front_raise.png",
+      "note": "프론트 레이즈 사진 매칭"
+    },
+    {
+      "name": "해머 컬",
+      "matched": true,
+      "imageAsset": "routine_images/hammer_curl.png",
+      "note": "해머 컬 사진 매칭"
+    },
+    {
+      "name": "불가리안 스플릿 스쿼트",
+      "matched": true,
+      "imageAsset": "routine_images/bulgarian_split_squat.png",
+      "note": "불가리안 스플릿 스쿼트 사진 매칭"
+    },
+    {
+      "name": "행잉 레그 레이즈",
+      "matched": true,
+      "imageAsset": "routine_images/hanging_leg_raise.png",
+      "note": "행잉 레그 레이즈 사진 매칭"
+    },
+    {
+      "name": "리어 델트 플라이",
+      "matched": true,
+      "imageAsset": "routine_images/rear_delt_fly.png",
+      "note": "리어 델트 플라이 사진 매칭"
+    },
+    {
+      "name": "아놀드 프레스",
+      "matched": true,
+      "imageAsset": "routine_images/arnold_press.png",
+      "note": "아놀드 프레스 사진 매칭"
+    },
+    {
+      "name": "힙 쓰러스트",
+      "matched": true,
+      "imageAsset": "routine_images/hip_thrust.png",
+      "note": "힙 쓰러스트 사진 매칭"
+    },
+    {
+      "name": "덤벨 킥백",
+      "matched": true,
+      "imageAsset": "routine_images/dumbbell_kickback.png",
+      "note": "덤벨 킥백 사진 매칭"
+    },
+    {
+      "name": "런지",
+      "matched": true,
+      "imageAsset": "routine_images/lunge.png",
+      "note": "런지 사진 매칭"
+    },
+    {
+      "name": "케이블 푸쉬다운",
+      "matched": true,
+      "imageAsset": "routine_images/cable_pushdown.png",
+      "note": "케이블 푸쉬다운 사진 매칭"
+    },
+    {
+      "name": "글루트 브릿지",
+      "matched": true,
+      "imageAsset": "routine_images/glute_bridge.png",
+      "note": "글루트 브릿지 사진 매칭"
+    },
+    {
+      "name": "푸쉬업",
+      "matched": true,
+      "imageAsset": "routine_images/push_up.png",
+      "note": "푸쉬업 사진 매칭"
+    },
+    {
+      "name": "머신 로우",
+      "matched": true,
+      "imageAsset": "routine_images/machine_row.png",
+      "note": "머신 로우 사진 매칭"
+    },
+    {
+      "name": "크런치",
+      "matched": true,
+      "imageAsset": "routine_images/crunch.png",
+      "note": "크런치 사진 매칭"
+    },
+    {
+      "name": "티바 로우",
+      "matched": true,
+      "imageAsset": "routine_images/t_bar_row.png",
+      "note": "티바 로우 사진 매칭"
+    },
+    {
+      "name": "프리처 컬",
+      "matched": true,
+      "imageAsset": "routine_images/preacher_curl.png",
+      "note": "프리처 컬 사진 매칭"
+    },
+    {
+      "name": "페이스풀",
+      "matched": true,
+      "imageAsset": "routine_images/face_pull.png",
+      "note": "페이스풀 사진 매칭"
+    },
+    {
+      "name": "체스트 프레스 머신",
+      "matched": true,
+      "imageAsset": "routine_images/chest_press_machine.png",
+      "note": "체스트 프레스 머신 사진 매칭"
+    },
+    {
+      "name": "플랭크",
+      "matched": true,
+      "imageAsset": "routine_images/plank.png",
+      "note": "플랭크 사진 매칭"
+    },
+    {
+      "name": "원암 덤벨 로우",
+      "matched": true,
+      "imageAsset": "routine_images/one_arm_dumbbell_row.png",
+      "note": "원암 덤벨 로우 사진 매칭"
+    },
+    {
+      "name": "케이블 크로스오버",
+      "matched": true,
+      "imageAsset": "routine_images/cable_crossover.png",
+      "note": "케이블 크로스오버 사진 매칭"
+    },
+    {
+      "name": "펙덱 플라이",
+      "matched": true,
+      "imageAsset": "routine_images/pec_deck_fly.png",
+      "note": "펙덱 플라이 사진 매칭"
     }
   ],
   "unmatchedExercises": [],
