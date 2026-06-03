@@ -69,6 +69,12 @@ fun LoginScreen(
             singleLine = true,
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            supportingText = {
+                if (isRegisterMode) {
+                    Text("회원가입 시 비밀번호는 6자 이상 입력해주세요.")
+                }
+            },
+            isError = isRegisterMode && password.isNotEmpty() && password.length < 6,
             modifier = Modifier.fillMaxWidth()
         )
 

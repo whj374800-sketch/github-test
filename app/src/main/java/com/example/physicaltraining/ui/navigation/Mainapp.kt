@@ -59,7 +59,8 @@ import com.example.physicaltraining.ui.screen.WorkoutInputScreen
 @Composable
 fun MainApp(
     viewModel: WorkoutViewModel,
-    onLogout : () -> Unit = {}
+    onLogout : () -> Unit = {},
+    startDestination: String = AppRoute.Home.route
 ) {
     val navController = rememberNavController()
 
@@ -76,7 +77,7 @@ fun MainApp(
 
         NavHost(
             navController = navController,
-            startDestination = AppRoute.Home.route,
+            startDestination = startDestination,
             modifier = Modifier.systemBarsPadding()
         ) {
 
@@ -217,6 +218,25 @@ fun HomeScreen(
     val completedSets = currentRoutineSets.count { it.isChecked }
     val progress = if (totalSets == 0) 0f else completedSets / totalSets.toFloat()
     val completedHistoryCount = history.count { it.isCompleted }
+    val currentProgramName = nextRoutine?.name?.substringBefore(" - ")?.trim()
+    val weeklyRoutines = if (currentProgramName.isNullOrBlank()) {
+        routines.filter { it.exercises.values.flatten().isNotEmpty() }
+    } else {
+        routines.filter {
+            it.name.substringBefore(" - ").trim() == currentProgramName &&
+                    it.exercises.values.flatten().isNotEmpty()
+        }
+    }
+    val weeklyCompletedRoutineCount = weeklyRoutines.count { routine ->
+        routine.exercises.values.flatten().all { it.isChecked }
+    }
+    val weeklyRoutineCount = weeklyRoutines.size
+    val weeklyProgress = if (weeklyRoutineCount == 0) {
+        0f
+    } else {
+        weeklyCompletedRoutineCount / weeklyRoutineCount.toFloat()
+    }
+    val remainingWeeklyRoutines = (weeklyRoutineCount - weeklyCompletedRoutineCount).coerceAtLeast(0)
 
     Column(
         modifier = Modifier
@@ -254,7 +274,7 @@ fun HomeScreen(
                 )
                 Text(
                     text = if (nextRoutine == null) {
-                        "AI 무게 설정에서 첫 루틴을 생성해보세요."
+                        "프로필 정보를 바탕으로 AI 맞춤 루틴을 생성해보세요."
                     } else {
                         "${completedSets}/${totalSets} 세트 완료"
                     },
@@ -286,6 +306,37 @@ fun HomeScreen(
             HomeMetric("루틴", routines.size.toString(), Modifier.weight(1f))
             HomeMetric("운동", routines.sumOf { it.exercises.size }.toString(), Modifier.weight(1f))
             HomeMetric("기록", completedHistoryCount.toString(), Modifier.weight(1f))
+        }
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(8.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                Text(
+                    text = "이번 주 루틴 진행률",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = if (weeklyRoutineCount == 0) {
+                        "AI 맞춤 루틴을 생성하면 주간 진행률이 표시됩니다."
+                    } else {
+                        "${weeklyRoutineCount}개 루틴 중 ${weeklyCompletedRoutineCount}개 완료 · 증량까지 ${remainingWeeklyRoutines}개 남음"
+                    },
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                LinearProgressIndicator(
+                    progress = { weeklyProgress },
+                    modifier = Modifier.fillMaxWidth(),
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
         }
 
         Text("빠른 메뉴", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)

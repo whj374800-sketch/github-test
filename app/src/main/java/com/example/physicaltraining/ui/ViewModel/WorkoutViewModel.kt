@@ -71,6 +71,9 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
     private val _weeklyProgressionRequest = MutableStateFlow<WeeklyProgressionRequest?>(null)
     val weeklyProgressionRequest = _weeklyProgressionRequest.asStateFlow()
 
+    private val _backupStatusMessage = MutableStateFlow<String?>(null)
+    val backupStatusMessage = _backupStatusMessage.asStateFlow()
+
     private val _userProfile =
         MutableStateFlow<UserProfileEntity?>(null)
 
@@ -108,6 +111,10 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
 
         hasRestoredWorkoutHistoryFromFirebase = true
         restoreWorkoutHistoryFromFirebase(firebaseBackupUserId)
+    }
+
+    fun clearBackupStatusMessage() {
+        _backupStatusMessage.value = null
     }
 
     fun getAiRecommendation(inputData: FloatArray): FloatArray {
@@ -821,6 +828,7 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
             )
         } catch (e: Exception) {
             Log.e("FIREBASE_BACKUP", "토글 직후 자동 백업 실패", e)
+            _backupStatusMessage.value = "자동 백업에 실패했습니다. 네트워크를 확인해주세요."
         }
     }
 

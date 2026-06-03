@@ -32,6 +32,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.text.font.FontWeight
@@ -108,7 +109,7 @@ fun GraphScreen(viewModel: WorkoutViewModel) {
                 fontWeight = FontWeight.Bold
             )
             Text(
-                text = "주차별 최고 중량과 총 볼륨 변화를 확인합니다.",
+                text = "완료 체크한 운동 기록을 기준으로 주차별 최고 중량과 총 볼륨 변화를 확인합니다.",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -173,12 +174,17 @@ fun GraphScreen(viewModel: WorkoutViewModel) {
                 )
                 GraphMetricCard(
                     label = "총 볼륨",
-                    value = totalVolume.toInt().toString(),
+                    value = "${totalVolume.toInt()}",
                     modifier = Modifier.weight(1f)
                 )
             }
 
-            ChartCard(title = "주차별 최고 중량") {
+            GraphInfoCard()
+
+            ChartCard(
+                title = "주차별 최고 중량",
+                description = "각 주차에 완료한 세트 중 가장 높은 무게입니다."
+            ) {
                 VolumeLineChart(
                     data = weightData,
                     suffix = "kg",
@@ -193,7 +199,10 @@ fun GraphScreen(viewModel: WorkoutViewModel) {
                 )
             }
 
-            ChartCard(title = "주차별 총 볼륨") {
+            ChartCard(
+                title = "주차별 총 볼륨",
+                description = "완료한 세트의 무게 x 횟수를 모두 더한 값입니다."
+            ) {
                 VolumeLineChart(
                     data = volumeData,
                     suffix = "",
@@ -254,7 +263,32 @@ fun GraphMetricCard(label: String, value: String, modifier: Modifier = Modifier)
 }
 
 @Composable
-fun ChartCard(title: String, content: @Composable () -> Unit) {
+fun GraphInfoCard() {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(8.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
+            Text(
+                text = "그래프 기준",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = "최고 중량은 해당 주차의 가장 무거운 완료 세트, 총 볼륨은 무게 x 횟수의 합계입니다.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.78f)
+            )
+        }
+    }
+}
+
+@Composable
+fun ChartCard(title: String, description: String, content: @Composable () -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(8.dp)
@@ -267,6 +301,11 @@ fun ChartCard(title: String, content: @Composable () -> Unit) {
                 text = title,
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = description,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             content()
         }
@@ -281,6 +320,8 @@ fun VolumeLineChart(
 ) {
     val primaryColor = MaterialTheme.colorScheme.primary
     val gridColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
+    val labelColor = MaterialTheme.colorScheme.onSurfaceVariant.toArgb()
+    val axisColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.82f).toArgb()
 
     Canvas(modifier = modifier) {
         if (data.isEmpty()) return@Canvas
@@ -300,14 +341,14 @@ fun VolumeLineChart(
         val usableHeight = graphHeight - topPadding - bottomPadding
 
         val labelPaint = Paint().apply {
-            color = android.graphics.Color.DKGRAY
+            color = labelColor
             textSize = 26f
             textAlign = Paint.Align.CENTER
             isAntiAlias = true
         }
 
         val axisPaint = Paint().apply {
-            color = android.graphics.Color.GRAY
+            color = axisColor
             textSize = 22f
             textAlign = Paint.Align.RIGHT
             isAntiAlias = true

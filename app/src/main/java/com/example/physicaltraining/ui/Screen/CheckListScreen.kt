@@ -33,6 +33,8 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -66,6 +68,7 @@ private fun isBodyWeightOnlyExercise(exerciseName: String): Boolean {
 @Composable
 fun CheckListScreen(routineId: String, viewModel: WorkoutViewModel, navController: NavController) {
     val routines by viewModel.routines.collectAsState()
+    val backupStatusMessage by viewModel.backupStatusMessage.collectAsState()
     val currentRoutine = routines.find { it.id == routineId }
 
     if (currentRoutine == null) {
@@ -77,12 +80,20 @@ fun CheckListScreen(routineId: String, viewModel: WorkoutViewModel, navControlle
     var showExerciseDeleteDialogFor by remember { mutableStateOf<String?>(null) }
     var inputWeight by remember { mutableStateOf("") }
     var inputReps by remember { mutableStateOf("") }
+    val snackbarHostState = remember { SnackbarHostState() }
     val totalSets = currentRoutine.exercises.values.sumOf { it.size }
     val completedSets = currentRoutine.exercises.values.flatten().count { it.isChecked }
     val progress = if (totalSets == 0) 0f else completedSets / totalSets.toFloat()
 
+    LaunchedEffect(backupStatusMessage) {
+        backupStatusMessage?.let { message ->
+            snackbarHostState.showSnackbar(message)
+            viewModel.clearBackupStatusMessage()
+        }
+    }
 
     Scaffold(
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         bottomBar = {
             Box(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
                 Button(

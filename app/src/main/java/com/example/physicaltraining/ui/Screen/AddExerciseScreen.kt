@@ -1,6 +1,7 @@
 package com.example.physicaltraining.ui.screen
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -27,6 +28,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -74,9 +76,22 @@ fun AddExerciseScreen(
                 items.firstOrNull { it.name == displayName } ?: items.first()
             }
     }
-    val groupedCatalog = remember(displayCatalog) {
+    var searchQuery by remember { mutableStateOf("") }
+    val filteredCatalog = remember(displayCatalog, searchQuery) {
+        val query = searchQuery.trim()
+        if (query.isBlank()) {
+            displayCatalog
+        } else {
+            displayCatalog.filter { item ->
+                item.name.contains(query, ignoreCase = true) ||
+                        item.bodyPart.contains(query, ignoreCase = true) ||
+                        item.description.contains(query, ignoreCase = true)
+            }
+        }
+    }
+    val groupedCatalog = remember(filteredCatalog) {
         bodyPartOrder.mapNotNull { part ->
-            val items = displayCatalog.filter { it.bodyPart == part }
+            val items = filteredCatalog.filter { it.bodyPart == part }
             if (items.isEmpty()) null else part to items
         }
     }
@@ -157,6 +172,14 @@ fun AddExerciseScreen(
                 AddExercisePreviewCard(item = selected)
             }
 
+            OutlinedTextField(
+                value = searchQuery,
+                onValueChange = { searchQuery = it },
+                label = { Text("운동 검색") },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth()
+            )
+
             LazyColumn(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -179,6 +202,16 @@ fun AddExerciseScreen(
                             item = item,
                             selected = item.name == selectedExercise?.name,
                             onClick = { selectedExercise = item }
+                        )
+                    }
+                }
+                if (filteredCatalog.isEmpty()) {
+                    item {
+                        Text(
+                            text = "검색 결과가 없습니다.",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(vertical = 24.dp)
                         )
                     }
                 }
@@ -281,6 +314,11 @@ private fun ExerciseCatalogRow(
             .fillMaxWidth()
             .clickable(onClick = onClick),
         shape = RoundedCornerShape(8.dp),
+        border = if (selected) {
+            BorderStroke(1.dp, MaterialTheme.colorScheme.primary)
+        } else {
+            null
+        },
         colors = CardDefaults.cardColors(
             containerColor = if (selected) {
                 MaterialTheme.colorScheme.primaryContainer

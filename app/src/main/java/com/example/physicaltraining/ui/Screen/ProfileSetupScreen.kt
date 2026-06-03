@@ -36,7 +36,8 @@ import com.example.physicaltraining.ui.WorkoutViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileSetupScreen(
-    viewModel: WorkoutViewModel
+    viewModel: WorkoutViewModel,
+    onProfileSaved: () -> Unit = {}
 ) {
     var name by remember { mutableStateOf("") }
     var age by remember { mutableStateOf("") }
@@ -194,6 +195,7 @@ fun ProfileSetupScreen(
                                 experience = experience,
                                 goal = goal
                             )
+                            onProfileSaved()
                         }
                     }
                 },
@@ -201,7 +203,7 @@ fun ProfileSetupScreen(
                     .fillMaxWidth()
                     .height(52.dp)
             ) {
-                Text("저장하고 시작하기", fontWeight = FontWeight.Bold)
+                Text("저장하고 AI 루틴 만들기", fontWeight = FontWeight.Bold)
             }
         }
     }
