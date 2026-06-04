@@ -2,6 +2,7 @@ package com.example.physicaltraining.ui.screen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,7 +17,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
@@ -150,7 +150,7 @@ fun AddExerciseScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(56.dp),
-                    shape = RoundedCornerShape(8.dp),
+                    shape = MaterialTheme.shapes.small,
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.primary,
                         contentColor = MaterialTheme.colorScheme.onPrimary
@@ -243,7 +243,8 @@ private fun AddExercisePreviewCard(item: RoutineExerciseCatalogItem) {
 
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(8.dp),
+        shape = MaterialTheme.shapes.small,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.35f)),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
         Column(
@@ -269,7 +270,11 @@ private fun AddExercisePreviewCard(item: RoutineExerciseCatalogItem) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(220.dp),
+                        .height(220.dp)
+                        .background(
+                            color = MaterialTheme.colorScheme.background,
+                            shape = MaterialTheme.shapes.small
+                        ),
                     contentAlignment = Alignment.Center
                 ) {
                     Image(
@@ -283,7 +288,11 @@ private fun AddExercisePreviewCard(item: RoutineExerciseCatalogItem) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(140.dp),
+                        .height(140.dp)
+                        .background(
+                            color = MaterialTheme.colorScheme.background,
+                            shape = MaterialTheme.shapes.small
+                        ),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
@@ -313,11 +322,11 @@ private fun ExerciseCatalogRow(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick),
-        shape = RoundedCornerShape(8.dp),
+        shape = MaterialTheme.shapes.small,
         border = if (selected) {
             BorderStroke(1.dp, MaterialTheme.colorScheme.primary)
         } else {
-            null
+            BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
         },
         colors = CardDefaults.cardColors(
             containerColor = if (selected) {
@@ -337,7 +346,7 @@ private fun ExerciseCatalogRow(
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold,
                     color = if (selected) {
-                        MaterialTheme.colorScheme.onPrimaryContainer
+                        MaterialTheme.colorScheme.primary
                     } else {
                         MaterialTheme.colorScheme.onSurface
                     },

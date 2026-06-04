@@ -1,5 +1,6 @@
 package com.example.physicaltraining.ui.screen
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,13 +14,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FloatingActionButton
@@ -53,7 +54,10 @@ fun RoutineScreen(viewModel: WorkoutViewModel, navController: NavController) {
 
     Scaffold(
         floatingActionButton = {
-            FloatingActionButton(onClick = { showAddRoutineDialog = true }) {
+            FloatingActionButton(
+                onClick = { showAddRoutineDialog = true },
+                shape = MaterialTheme.shapes.small
+            ) {
                 Icon(Icons.Default.Add, contentDescription = "루틴 추가")
             }
         }
@@ -92,7 +96,15 @@ fun RoutineScreen(viewModel: WorkoutViewModel, navController: NavController) {
                             .clickable {
                                 navController.navigate("checklist/${routine.id}")
                             },
-                        shape = RoundedCornerShape(8.dp),
+                        shape = MaterialTheme.shapes.small,
+                        border = BorderStroke(
+                            1.dp,
+                            if (progress >= 1f && setCount > 0) {
+                                MaterialTheme.colorScheme.primary.copy(alpha = 0.55f)
+                            } else {
+                                MaterialTheme.colorScheme.outlineVariant
+                            }
+                        ),
                         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
                         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
                     ) {
@@ -108,7 +120,12 @@ fun RoutineScreen(viewModel: WorkoutViewModel, navController: NavController) {
                                 Text(
                                     text = routine.name,
                                     style = MaterialTheme.typography.titleLarge,
-                                    fontWeight = FontWeight.Bold
+                                    fontWeight = FontWeight.Bold,
+                                    color = if (progress >= 1f && setCount > 0) {
+                                        MaterialTheme.colorScheme.primary
+                                    } else {
+                                        MaterialTheme.colorScheme.onSurface
+                                    }
                                 )
 
                                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -134,7 +151,11 @@ fun RoutineScreen(viewModel: WorkoutViewModel, navController: NavController) {
                                         navController.navigate("checklist/${routine.id}")
                                     },
                                     modifier = Modifier.fillMaxWidth().height(44.dp),
-                                    shape = RoundedCornerShape(8.dp)
+                                    shape = MaterialTheme.shapes.small,
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = MaterialTheme.colorScheme.primary,
+                                        contentColor = MaterialTheme.colorScheme.onPrimary
+                                    )
                                 ) {
                                     Icon(Icons.Default.PlayArrow, contentDescription = null)
                                     Spacer(modifier = Modifier.width(6.dp))
@@ -174,7 +195,8 @@ fun RoutineScreen(viewModel: WorkoutViewModel, navController: NavController) {
 @Composable
 fun RoutineChip(text: String) {
     Card(
-        shape = RoundedCornerShape(8.dp),
+        shape = MaterialTheme.shapes.small,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
     ) {
         Text(
@@ -228,4 +250,3 @@ fun AddRoutineDialog(
             }
             )
         }
-

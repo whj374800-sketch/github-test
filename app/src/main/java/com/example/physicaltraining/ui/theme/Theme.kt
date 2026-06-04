@@ -2,8 +2,11 @@ package com.example.physicaltraining.ui.theme
 
 import android.app.Activity
 import android.os.Build
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Shapes
 import androidx.compose.material3.Surface
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
@@ -11,10 +14,10 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.Modifier
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 
 private val DarkColorScheme = darkColorScheme(
@@ -55,6 +58,14 @@ private val LightColorScheme = lightColorScheme(
     error = androidx.compose.ui.graphics.Color(0xFFFF6B4A)
 )
 
+private val TrainingShapes = Shapes(
+    extraSmall = RoundedCornerShape(2.dp),
+    small = RoundedCornerShape(2.dp),
+    medium = RoundedCornerShape(3.dp),
+    large = RoundedCornerShape(4.dp),
+    extraLarge = RoundedCornerShape(4.dp)
+)
+
 @Composable
 fun PhysicalTrainingTheme(
     darkTheme: Boolean = true,
@@ -86,7 +97,8 @@ fun PhysicalTrainingTheme(
 
     MaterialTheme(
         colorScheme = colorScheme,
-        typography = Typography
+        typography = Typography,
+        shapes = TrainingShapes
     ) {
         Surface(
             modifier = Modifier.fillMaxSize(),

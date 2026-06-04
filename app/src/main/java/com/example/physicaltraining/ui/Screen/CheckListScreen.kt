@@ -1,5 +1,6 @@
 package com.example.physicaltraining.ui.screen
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -15,7 +16,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -101,10 +101,10 @@ fun CheckListScreen(routineId: String, viewModel: WorkoutViewModel, navControlle
                         navController.navigate(AppRoute.AddExercise.createRoute(currentRoutine.id))
                     },
                     modifier = Modifier.fillMaxWidth().height(56.dp),
-                    shape = RoundedCornerShape(8.dp),
+                    shape = MaterialTheme.shapes.small,
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.primary,
-                        contentColor = Color.White
+                        contentColor = MaterialTheme.colorScheme.onPrimary
                     )
                 ) {
                     Text("운동 종목 추가", style = MaterialTheme.typography.titleMedium)
@@ -142,9 +142,18 @@ fun CheckListScreen(routineId: String, viewModel: WorkoutViewModel, navControlle
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 items(currentRoutine.exercises.entries.toList()) { (exercise, sets) ->
+                    val exerciseCompleted = sets.isNotEmpty() && sets.all { it.isChecked }
                     Card(
                         modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(8.dp),
+                        shape = MaterialTheme.shapes.small,
+                        border = BorderStroke(
+                            1.dp,
+                            if (exerciseCompleted) {
+                                MaterialTheme.colorScheme.primary.copy(alpha = 0.58f)
+                            } else {
+                                MaterialTheme.colorScheme.outlineVariant
+                            }
+                        ),
                         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                     ) {
@@ -160,7 +169,12 @@ fun CheckListScreen(routineId: String, viewModel: WorkoutViewModel, navControlle
                                 Text(
                                     text = exercise,
                                     style = MaterialTheme.typography.titleLarge,
-                                    fontWeight = FontWeight.Bold
+                                    fontWeight = FontWeight.Bold,
+                                    color = if (exerciseCompleted) {
+                                        MaterialTheme.colorScheme.primary
+                                    } else {
+                                        MaterialTheme.colorScheme.onSurface
+                                    }
                                 )
                                 Text(
                                     text = "${sets.size}세트 · 휴식 ${sets.firstOrNull()?.restTime ?: 60}초",
@@ -189,10 +203,10 @@ fun CheckListScreen(routineId: String, viewModel: WorkoutViewModel, navControlle
                             verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            Text("SET", modifier = Modifier.width(52.dp), style = MaterialTheme.typography.labelMedium)
-                            Text("KG", modifier = Modifier.weight(1f), style = MaterialTheme.typography.labelMedium)
-                            Text("REPS", modifier = Modifier.weight(1f), style = MaterialTheme.typography.labelMedium)
-                            Text("완료", modifier = Modifier.width(72.dp), style = MaterialTheme.typography.labelMedium)
+                            Text("SET", modifier = Modifier.width(52.dp), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
+                            Text("KG", modifier = Modifier.weight(1f), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
+                            Text("REPS", modifier = Modifier.weight(1f), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
+                            Text("완료", modifier = Modifier.width(72.dp), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
                             Spacer(modifier = Modifier.width(48.dp))
                         }
 
