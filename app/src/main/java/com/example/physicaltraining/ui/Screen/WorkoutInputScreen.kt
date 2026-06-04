@@ -271,6 +271,7 @@ fun WorkoutInputScreen(
                         context = context,
                         userInputs = aiInputData,
                         routineName = selectedRoutineName,
+                        goal = goal,
                         onComplete = {
                             onCalculationComplete()
                         }

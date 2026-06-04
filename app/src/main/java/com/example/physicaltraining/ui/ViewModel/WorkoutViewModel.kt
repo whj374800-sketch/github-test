@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlin.math.roundToInt
 import java.util.UUID
 
 
@@ -119,6 +120,103 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
 
     fun getAiRecommendation(inputData: FloatArray): FloatArray {
         return modelManager?.predict(inputData) ?: floatArrayOf(0f, 0f, 0f, 0f)
+    }
+
+    private fun stabilizeAiLiftResult(
+        rawResult: FloatArray?,
+        gender: String,
+        bodyWeight: Float,
+        experience: String,
+        goal: String
+    ): FloatArray {
+        val fallback = fallbackAiLiftResult(
+            UserProfileEntity(
+                name = "",
+                age = 25,
+                weight = bodyWeight,
+                gender = gender,
+                experience = experience,
+                goal = goal
+            )
+        )
+
+        val source = rawResult
+            ?.takeIf { it.size >= 3 && it.take(3).all { value -> value > 0f } }
+            ?: fallback
+
+        val safeBodyWeight = bodyWeight.takeIf { it in 30f..180f } ?: 70f
+        val genderScale = if (gender == "여성") 0.72f else 1f
+        val ranges = when (experience) {
+            "상급자" -> LiftRatioRange(
+                bench = 0.75f..2.0f,
+                squat = 1.10f..2.6f,
+                deadlift = 1.30f..3.0f
+            )
+            "중급자" -> LiftRatioRange(
+                bench = 0.55f..1.4f,
+                squat = 0.80f..1.9f,
+                deadlift = 1.00f..2.3f
+            )
+            else -> LiftRatioRange(
+                bench = 0.35f..0.95f,
+                squat = 0.50f..1.3f,
+                deadlift = 0.65f..1.6f
+            )
+        }
+
+        val intensityScale = when (goal) {
+            "스트렝스" -> 0.95f
+            "근비대" -> 0.90f
+            "다이어트" -> 0.82f
+            "유지/재활" -> 0.72f
+            else -> 0.88f
+        }
+
+        var bench = source[0].coerceIn(
+            safeBodyWeight * ranges.bench.start * genderScale,
+            safeBodyWeight * ranges.bench.endInclusive * genderScale
+        )
+        var squat = source[1].coerceIn(
+            safeBodyWeight * ranges.squat.start * genderScale,
+            safeBodyWeight * ranges.squat.endInclusive * genderScale
+        )
+        var deadlift = source[2].coerceIn(
+            safeBodyWeight * ranges.deadlift.start * genderScale,
+            safeBodyWeight * ranges.deadlift.endInclusive * genderScale
+        )
+
+        squat = squat.coerceAtLeast(bench * 1.05f)
+        deadlift = deadlift.coerceAtLeast(squat * 1.05f)
+
+        bench = roundAiLiftWeight(bench * intensityScale)
+        squat = roundAiLiftWeight(squat * intensityScale)
+        deadlift = roundAiLiftWeight(deadlift * intensityScale)
+
+        val restAdjustment = goalRestAdjustment(goal, source.getOrNull(3) ?: 0f)
+
+        return floatArrayOf(bench, squat, deadlift, restAdjustment)
+    }
+
+    private data class LiftRatioRange(
+        val bench: ClosedFloatingPointRange<Float>,
+        val squat: ClosedFloatingPointRange<Float>,
+        val deadlift: ClosedFloatingPointRange<Float>
+    )
+
+    private fun roundAiLiftWeight(weight: Float): Float {
+        return ((weight / 2.5f).roundToInt() * 2.5f).coerceAtLeast(2.5f)
+    }
+
+    private fun goalRestAdjustment(goal: String, modelAdjustment: Float): Float {
+        val clampedModelAdjustment = modelAdjustment.coerceIn(-30f, 45f)
+        val goalAdjustment = when (goal) {
+            "스트렝스" -> 30f
+            "근비대" -> 0f
+            "다이어트" -> -25f
+            "유지/재활" -> -10f
+            else -> 0f
+        }
+        return (clampedModelAdjustment + goalAdjustment).coerceIn(-30f, 60f)
     }
 
 
@@ -234,9 +332,13 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
             )
             val aiResult = modelManager?.predict(aiInput)
 
-            if (aiResult != null && aiResult.size >= 3 && aiResult.take(3).all { it > 0f }) {
-                return aiResult
-            }
+            return stabilizeAiLiftResult(
+                rawResult = aiResult,
+                gender = profile.gender,
+                bodyWeight = profile.weight,
+                experience = profile.experience,
+                goal = profile.goal
+            )
         }
 
         return fallbackAiLiftResult(profile)
@@ -461,11 +563,23 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
     fun getRecommendedRoutine(
         context: Context,
         userInputs: FloatArray,
-        blueprint: List<RoutineRepository.ExerciseDetail>
+        blueprint: List<RoutineRepository.ExerciseDetail>,
+        goal: String = "근비대"
     ): List<CalculatedExercise> {
         initModel(context)
         val calculator = RoutineWeightCalculator()
-        val aiResult = modelManager!!.predict(userInputs)
+        val rawAiResult = modelManager!!.predict(userInputs)
+        val aiResult = stabilizeAiLiftResult(
+            rawResult = rawAiResult,
+            gender = if (userInputs.getOrNull(0) == 1f) "남성" else "여성",
+            bodyWeight = userInputs.getOrNull(1) ?: 70f,
+            experience = when (userInputs.getOrNull(3)?.toInt()) {
+                3 -> "상급자"
+                2 -> "중급자"
+                else -> "초보자"
+            },
+            goal = goal
+        )
 
         val result = calculator.calculateRoutine(aiResult, blueprint)
 
@@ -486,13 +600,26 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
         context: Context,
         userInputs: FloatArray,
         routineName: String,
+        goal: String,
         onComplete: () -> Unit
     ) {
         initModel(context)
-        val aiResult = modelManager?.predict(userInputs) ?: floatArrayOf(0f, 0f, 0f, 0f)
+        val rawAiResult = modelManager?.predict(userInputs)
+        val aiResult = stabilizeAiLiftResult(
+            rawResult = rawAiResult,
+            gender = if (userInputs.getOrNull(0) == 1f) "남성" else "여성",
+            bodyWeight = userInputs.getOrNull(1) ?: 70f,
+            experience = when (userInputs.getOrNull(3)?.toInt()) {
+                3 -> "상급자"
+                2 -> "중급자"
+                else -> "초보자"
+            },
+            goal = goal
+        )
 
         android.util.Log.d("AI_TEST", "👉 1. AI에게 보낸 입력값: ${userInputs.contentToString()}")
-        android.util.Log.d("AI_TEST", "🚨 2. AI가 뱉어낸 진짜 결과값: ${aiResult.contentToString()}")
+        android.util.Log.d("AI_TEST", "🚨 2. AI가 뱉어낸 진짜 결과값: ${rawAiResult?.contentToString()}")
+        android.util.Log.d("AI_TEST", "✅ 3. 안정 보정 후 적용값: ${aiResult.contentToString()}")
 
         val calculator = RoutineWeightCalculator()
         val repoTemplate = RoutineRepository()
