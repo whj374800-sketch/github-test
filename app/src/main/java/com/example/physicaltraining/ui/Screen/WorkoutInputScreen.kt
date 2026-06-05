@@ -83,6 +83,8 @@ fun WorkoutInputScreen(
     var selectedRoutineName by remember { mutableStateOf("초보자 전신 루틴") }
     var routineExpanded by remember { mutableStateOf(false) }
     var showInfoDialog by remember { mutableStateOf(false) } // 팝업창 On/Off 상태
+    var showGenerationCompleteDialog by remember { mutableStateOf(false) }
+    var isGeneratingRoutine by remember { mutableStateOf(false) }
 
     val routineOptions = listOf(
         "nSuns 5/3/1", "PHUL 하이브리드", "StrongLifts 5x5", "PPL 분할 루틴",
@@ -248,6 +250,8 @@ fun WorkoutInputScreen(
 
             Button(
                 onClick = {
+                    isGeneratingRoutine = true
+
                     val userWeight = weight.toFloatOrNull() ?: 60f
                     val userAge = age.toFloatOrNull() ?: 25f
 
@@ -275,18 +279,23 @@ fun WorkoutInputScreen(
                         routineName = selectedRoutineName,
                         goal = goal,
                         onComplete = {
-                            onCalculationComplete()
+                            isGeneratingRoutine = false
+                            showGenerationCompleteDialog = true
                         }
                     )
                 },
                 modifier = Modifier.fillMaxWidth().height(50.dp),
+                enabled = !isGeneratingRoutine,
                 shape = androidx.compose.ui.graphics.RectangleShape,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.primary,
                     contentColor = MaterialTheme.colorScheme.onPrimary
                 )
             ) {
-                Text("AI 맞춤 루틴 생성 및 추천받기", fontWeight = FontWeight.Bold)
+                Text(
+                    if (isGeneratingRoutine) "AI 루틴 생성 중..." else "AI 맞춤 루틴 생성 및 추천받기",
+                    fontWeight = FontWeight.Bold
+                )
             }
         }
 
@@ -303,6 +312,34 @@ fun WorkoutInputScreen(
                 confirmButton = {
                     TextButton(onClick = { showInfoDialog = false }) {
                         Text("확인")
+                    }
+                }
+            )
+        }
+
+        if (showGenerationCompleteDialog) {
+            AlertDialog(
+                onDismissRequest = {
+                    showGenerationCompleteDialog = false
+                    onCalculationComplete()
+                },
+                title = {
+                    Text("루틴 생성 완료", fontWeight = FontWeight.Bold)
+                },
+                text = {
+                    Text(
+                        "AI의 추천을 받아 루틴 생성이 완료됐습니다!\n\n" +
+                                "루틴 목록에서 생성된 운동 계획을 확인해보세요."
+                    )
+                },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            showGenerationCompleteDialog = false
+                            onCalculationComplete()
+                        }
+                    ) {
+                        Text("루틴 보러가기")
                     }
                 }
             )

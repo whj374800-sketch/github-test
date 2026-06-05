@@ -109,48 +109,74 @@ fun RoutineScreen(viewModel: WorkoutViewModel, navController: NavController) {
                         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
                     ) {
 
-                        Box(modifier = Modifier.fillMaxWidth()) {
+                        Column(modifier = Modifier.fillMaxWidth()) {
+
+                            Box(modifier = Modifier.fillMaxWidth()) {
+                                Column(
+                                    modifier = Modifier
+                                        .padding(16.dp)
+                                        .padding(end = 42.dp),
+                                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                                ) {
+                                    Text(
+                                        text = routine.name,
+                                        style = MaterialTheme.typography.titleLarge,
+                                        fontWeight = FontWeight.Bold,
+                                        color = if (progress >= 1f && setCount > 0) {
+                                            MaterialTheme.colorScheme.primary
+                                        } else {
+                                            MaterialTheme.colorScheme.onSurface
+                                        }
+                                    )
+
+                                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                        RoutineChip("운동 ${exerciseCount}개")
+                                        RoutineChip("세트 ${setCount}개")
+                                        RoutineChip("완료 ${completedCount}개")
+                                    }
+
+                                    Text(
+                                        text = routine.exercises.keys.take(4).joinToString(" · ")
+                                            .ifBlank { "등록된 운동이 없습니다." },
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+
+                                IconButton(
+                                    onClick = {
+                                        viewModel.deleteRoutine(routine.id)
+                                    },
+                                    modifier = Modifier.align(Alignment.TopEnd)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Close,
+                                        contentDescription = "루틴 삭제",
+                                        tint = MaterialTheme.colorScheme.error
+                                    )
+                                }
+                            }
 
                             Column(
                                 modifier = Modifier
-                                    .padding(16.dp)
-                                    .padding(end = 42.dp),
+                                    .fillMaxWidth()
+                                    .padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
                                 verticalArrangement = Arrangement.spacedBy(10.dp)
                             ) {
-                                Text(
-                                    text = routine.name,
-                                    style = MaterialTheme.typography.titleLarge,
-                                    fontWeight = FontWeight.Bold,
-                                    color = if (progress >= 1f && setCount > 0) {
-                                        MaterialTheme.colorScheme.primary
-                                    } else {
-                                        MaterialTheme.colorScheme.onSurface
-                                    }
-                                )
-
-                                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                    RoutineChip("운동 ${exerciseCount}개")
-                                    RoutineChip("세트 ${setCount}개")
-                                    RoutineChip("완료 ${completedCount}개")
-                                }
-
                                 LinearProgressIndicator(
                                     progress = { progress },
-                                    modifier = Modifier.fillMaxWidth()
-                                )
-
-                                Text(
-                                    text = routine.exercises.keys.take(4).joinToString(" · ")
-                                        .ifBlank { "등록된 운동이 없습니다." },
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(6.dp)
                                 )
 
                                 Button(
                                     onClick = {
                                         navController.navigate("checklist/${routine.id}")
                                     },
-                                    modifier = Modifier.fillMaxWidth().height(44.dp),
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(46.dp),
                                     shape = MaterialTheme.shapes.small,
                                     colors = ButtonDefaults.buttonColors(
                                         containerColor = MaterialTheme.colorScheme.primary,
@@ -159,21 +185,8 @@ fun RoutineScreen(viewModel: WorkoutViewModel, navController: NavController) {
                                 ) {
                                     Icon(Icons.Default.PlayArrow, contentDescription = null)
                                     Spacer(modifier = Modifier.width(6.dp))
-                                    Text("루틴 시작")
+                                    Text("루틴 시작", fontWeight = FontWeight.Bold)
                                 }
-                            }
-
-                            IconButton(
-                                onClick = {
-                                    viewModel.deleteRoutine(routine.id)
-                                },
-                                modifier = Modifier.align(Alignment.TopEnd)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Close,
-                                    contentDescription = "루틴 삭제",
-                                    tint = MaterialTheme.colorScheme.error
-                                )
                             }
                         }
                     }
