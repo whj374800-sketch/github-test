@@ -174,7 +174,7 @@ AI 모델이 반환한 값은 그대로 사용하지 않고, 성별, 몸무게, 
 - **2분 요약 영상**: 업로드 후 링크 추가 예정
 - **10분 상세 발표 영상**: 업로드 후 링크 추가 예정
 - **프로젝트 최종 보고서 PDF**: [final_report.pdf](docs/final_report.pdf)
-- **APK 다운로드**: [Google Drive에서 다운로드](https://drive.google.com/file/d/1m_t6JbAjR2XcUM9RD4EIra5wmXZTi8Ld/view?usp=share_link)
+- **APK 다운로드**: [Google Drive에서 다운로드](https://drive.google.com/file/d/1p0qLIxFPGJW5suyWXUuYtgyCa902_DWN/view?usp=share_link)
 
 <img src="docs/apk_download_qr.png" width="180" alt="APK 다운로드 QR 코드">
 
