@@ -176,6 +176,8 @@ AI 모델이 반환한 값은 그대로 사용하지 않고, 성별, 몸무게, 
 - **프로젝트 최종 보고서 PDF**: [final_report.pdf](docs/final_report.pdf)
 - **APK 다운로드**: [Google Drive에서 다운로드](https://drive.google.com/file/d/1SCdcej7cwjUBcuz9Y34WkMskuU6NU55Y/view?usp=share_link)
 
+<img src="docs/apk_download_qr.png" width="180" alt="APK 다운로드 QR 코드">
+
 ## 빌드 방법
 
 ```bash
