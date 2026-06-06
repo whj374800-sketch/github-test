@@ -169,6 +169,13 @@ AI 모델이 반환한 값은 그대로 사용하지 않고, 성별, 몸무게, 
 - **운동 기록 그래프 로직**: 완료된 운동 기록을 주차별로 묶어 최고 중량과 총 볼륨을 계산합니다.
 - **자동 백업 로직**: 세트 완료 후 로컬 저장을 먼저 수행하고, 네트워크가 가능하면 Firebase 원격 백업을 시도합니다.
 
+## 자료 및 영상 링크
+
+- **2분 요약 영상**: 업로드 후 링크 추가 예정
+- **10분 상세 발표 영상**: 업로드 후 링크 추가 예정
+- **프로젝트 최종 보고서 PDF**: [final_report.pdf](docs/final_report.pdf)
+- **APK 다운로드**: [Google Drive에서 다운로드](https://drive.google.com/file/d/1SCdcej7cwjUBcuz9Y34WkMskuU6NU55Y/view?usp=share_link)
+
 ## 빌드 방법
 
 ```bash
