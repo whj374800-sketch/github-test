@@ -171,17 +171,11 @@ AI 모델이 반환한 값은 그대로 사용하지 않고, 성별, 몸무게, 
 
 ## 자료 및 영상 링크
 
-- **2분 요약 영상**: 업로드 후 링크 추가 예정
-- **10분 상세 발표 영상**: 업로드 후 링크 추가 예정
-- **프로젝트 최종 보고서 PDF**: [final_report.pdf](docs/final_report.pdf)
-- **APK 다운로드**: [Google Drive에서 다운로드](https://drive.google.com/file/d/1p0qLIxFPGJW5suyWXUuYtgyCa902_DWN/view?usp=share_link)
+* **2분 요약 영상**: [Google Drive에서 보기](https://drive.google.com/file/d/1rfF1zjr5iqInXjtYckAm7M6mwJUmtCP-/view?usp=share_link)
+* **10분 상세 발표 영상**: [YouTube에서 보기](https://youtu.be/d6h99HvJSZ0)
+* **프로젝트 최종 보고서 PDF**: [final_report.pdf](docs/final_report.pdf)
+* **APK 다운로드**: [Google Drive에서 다운로드](https://drive.google.com/file/d/1p0qLIxFPGJW5suyWXUuYtgyCa902_DWN/view?usp=share_link)
 
 <img src="docs/apk_download_qr.png" width="180" alt="APK 다운로드 QR 코드">
 
-## 빌드 방법
 
-```bash
-./gradlew :app:assembleDebug
-```
-
-빌드가 완료되면 `app/build/outputs/apk/debug/app-debug.apk` 파일을 통해 APK를 확인할 수 있습니다.
