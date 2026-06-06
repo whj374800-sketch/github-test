@@ -102,7 +102,7 @@ AI 모델이 반환한 값은 그대로 사용하지 않고, 성별, 몸무게, 
 ### 개발 언어 및 플랫폼
 
 - **Kotlin 2.0.21**: Android 앱 전체 로직과 UI를 구현한 주 언어입니다.
-- **Android SDK 36 / minSdk 35 / targetSdk 36**: 최신 Android 환경을 기준으로 앱을 구성했습니다.
+- **Android SDK 36 / minSdk 35 / targetSdk 36**: 프로젝트 제출 기준에 맞춰 Android 15 이상 환경을 기준으로 구성했습니다.
 - **Java 11**: Gradle 및 Android 컴파일 옵션에서 Java 11 호환성을 사용합니다.
 
 ### UI 프레임워크
@@ -174,7 +174,7 @@ AI 모델이 반환한 값은 그대로 사용하지 않고, 성별, 몸무게, 
 - **2분 요약 영상**: 업로드 후 링크 추가 예정
 - **10분 상세 발표 영상**: 업로드 후 링크 추가 예정
 - **프로젝트 최종 보고서 PDF**: [final_report.pdf](docs/final_report.pdf)
-- **APK 다운로드**: [Google Drive에서 다운로드](https://drive.google.com/file/d/1SCdcej7cwjUBcuz9Y34WkMskuU6NU55Y/view?usp=share_link)
+- **APK 다운로드**: [Google Drive에서 다운로드](https://drive.google.com/file/d/1m_t6JbAjR2XcUM9RD4EIra5wmXZTi8Ld/view?usp=share_link)
 
 <img src="docs/apk_download_qr.png" width="180" alt="APK 다운로드 QR 코드">
 
